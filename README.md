@@ -1,0 +1,2 @@
+# shareware
+Split Group Expenses
