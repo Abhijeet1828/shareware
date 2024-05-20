@@ -1,2 +1,2 @@
-# shareware
+# sharewise
 Split Group Expenses
