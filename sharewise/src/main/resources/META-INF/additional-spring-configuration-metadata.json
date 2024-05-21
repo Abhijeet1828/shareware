@@ -1,0 +1,47 @@
+{"properties": [
+  {
+    "name": "spring.datasource.max-active",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.datasource.max-active'"
+  },
+  {
+    "name": "spring.datasource.leakDetectionThreshold",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.datasource.leakDetectionThreshold'"
+  },
+  {
+    "name": "spring.datasource.autoCommit",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.datasource.autoCommit'"
+  },
+  {
+    "name": "spring.datasource.maxLifetime",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.datasource.maxLifetime'"
+  },
+  {
+    "name": "spring.datasource.idleTimeout",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.datasource.idleTimeout'"
+  },
+  {
+    "name": "spring.datasource.connectionTimeout",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.datasource.connectionTimeout'"
+  },
+  {
+    "name": "spring.datasource.validationQuery",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.datasource.validationQuery'"
+  },
+  {
+    "name": "spring.datasource.max-idle",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.datasource.max-idle'"
+  },
+  {
+    "name": "spring.datasource.validationQuery",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.datasource.validationQuery'"
+  }
+]}
