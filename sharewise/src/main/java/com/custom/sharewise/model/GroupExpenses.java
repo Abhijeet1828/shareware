@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -27,6 +29,7 @@ public class GroupExpenses extends BaseModel implements Serializable {
 	private static final long serialVersionUID = -1509621817233766213L;
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "group_expenses_id")
 	private Long groupExpensesId;
 

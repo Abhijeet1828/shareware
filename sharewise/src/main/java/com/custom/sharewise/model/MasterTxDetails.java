@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -26,6 +28,7 @@ public class MasterTxDetails extends BaseModel implements Serializable {
 	private static final long serialVersionUID = -7555188412170243892L;
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "master_tx_details_id")
 	private Long masterTxDetailsId;
 
