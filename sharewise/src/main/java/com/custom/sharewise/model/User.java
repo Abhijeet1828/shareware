@@ -31,6 +31,9 @@ public class User extends BaseModel implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "user_id")
 	private Long userId;
+	
+	@Column(name = "user_password")
+	private String password;
 
 	@Column(name = "first_name")
 	private String firstName;
@@ -38,10 +41,10 @@ public class User extends BaseModel implements Serializable {
 	@Column(name = "last_name")
 	private String lastName;
 
-	@Column(name = "mobile_no")
+	@Column(name = "mobile_no", nullable = false)
 	private Long mobileNumber;
 
-	@Column(name = "email")
+	@Column(name = "email", nullable = false)
 	private String email;
 
 }

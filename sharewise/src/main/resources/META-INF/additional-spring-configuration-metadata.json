@@ -43,5 +43,20 @@
     "name": "spring.datasource.validationQuery",
     "type": "java.lang.String",
     "description": "A description for 'spring.datasource.validationQuery'"
+  },
+  {
+    "name": "hibernate.connection.provider_disables_autocommit",
+    "type": "java.lang.String",
+    "description": "A description for 'hibernate.connection.provider_disables_autocommit'"
+  },
+  {
+    "name": "security.jwt.secret-key",
+    "type": "java.lang.String",
+    "description": "A description for 'security.jwt.secret-key'"
+  },
+  {
+    "name": "security.jwt.expiration-time",
+    "type": "java.lang.String",
+    "description": "A description for 'security.jwt.expiration-time'"
   }
 ]}
