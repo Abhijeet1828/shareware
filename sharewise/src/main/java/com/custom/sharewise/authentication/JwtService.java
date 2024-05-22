@@ -16,6 +16,13 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
+/**
+ * This utility service class contains methods to create, validate and extract
+ * JWT tokens.
+ * 
+ * @author Abhijeet
+ *
+ */
 @Service
 public class JwtService {
 

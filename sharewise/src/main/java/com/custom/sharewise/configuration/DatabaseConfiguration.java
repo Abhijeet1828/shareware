@@ -18,6 +18,15 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.zaxxer.hikari.HikariDataSource;
 
+/**
+ * This configuration class is used for customizing the database connection.
+ * 
+ * @implNote The annotations on the class enable transaction management and JPA
+ *           repositories.
+ * 
+ * @author Abhijeet
+ *
+ */
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(basePackages = "com.custom.sharewise.repository", entityManagerFactoryRef = "entityManagerFactory", transactionManagerRef = "transactionManager")
@@ -29,6 +38,12 @@ public class DatabaseConfiguration {
 		this.env = env;
 	}
 
+	/**
+	 * This bean creates a Hikari data source with different connection pooling
+	 * properties.
+	 * 
+	 * @return {@link HikariDataSource}
+	 */
 	@Primary
 	@Bean(name = "dataSource")
 	HikariDataSource dataSource() {
@@ -49,6 +64,14 @@ public class DatabaseConfiguration {
 		return hikariDataSource;
 	}
 
+	/**
+	 * This bean creates entity manager factory which scans the entity classes in
+	 * the application and defines a JPA vendor.
+	 * 
+	 * @param dataSource - {@link HikariDataSource}
+	 * 
+	 * @return {@link LocalContainerEntityManagerFactoryBean}
+	 */
 	@Primary
 	@Bean(name = "entityManagerFactory")
 	LocalContainerEntityManagerFactoryBean entityManagerFactory(
@@ -65,6 +88,13 @@ public class DatabaseConfiguration {
 		return em;
 	}
 
+	/**
+	 * This bean creates transaction manager which helps add transactions to
+	 * queries.
+	 * 
+	 * @param entityManagerFactory
+	 * @return
+	 */
 	@Primary
 	@Bean(name = "transactionManager")
 	PlatformTransactionManager transactionManager(
@@ -75,6 +105,12 @@ public class DatabaseConfiguration {
 		return jpaTransactionManager;
 	}
 
+	/**
+	 * This bean creates session factory for hibernate.
+	 * 
+	 * @param dataSource
+	 * @return
+	 */
 	@Bean(name = "sessionFactory")
 	LocalSessionFactoryBean sessionFactory(@Qualifier(value = "dataSource") HikariDataSource dataSource) {
 		LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
@@ -85,6 +121,11 @@ public class DatabaseConfiguration {
 		return sessionFactory;
 	}
 
+	/**
+	 * Provides additional hibernate properties.
+	 * 
+	 * @return
+	 */
 	private Properties additionalProperties() {
 		Properties properties = new Properties();
 		properties.setProperty("hibernate.dialect", env.getProperty("spring.jpa.properties.hibernate.dialect"));

@@ -12,6 +12,16 @@ import org.springframework.stereotype.Component;
 import com.custom.sharewise.model.User;
 import com.custom.sharewise.repository.UserRepository;
 
+/**
+ * This service class is used by Spring Security to find the users by the
+ * username.
+ * 
+ * @implNote It implements the {@link UserDetailsService} interface of Spring
+ *           Security.
+ * 
+ * @author Abhijeet
+ *
+ */
 @Component
 public class UserDetailsServiceImpl implements UserDetailsService {
 
@@ -23,6 +33,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		this.userRepository = userRepository;
 	}
 
+	/**
+	 * This method provides a custom implementation for loading users according to
+	 * the application. This method is used by Spring Security for loading users and
+	 * authenticating them later on.
+	 */
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		LOGGER.info("Entering in loadUserByUsername method");

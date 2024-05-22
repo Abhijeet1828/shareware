@@ -8,6 +8,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.custom.sharewise.model.User;
 
+/**
+ * This is a custom user details class which is used for Spring Security
+ * authentication. This is required by Spring Security to authenticate user by
+ * their respective username and passwords.
+ * 
+ * @implNote Extends the model {@link User}.
+ * @implNote Implements the Spring Security {@link UserDetails}.
+ * 
+ * @author Abhijeet
+ *
+ */
 public class CustomUserDetails extends User implements UserDetails {
 
 	private static final long serialVersionUID = 4583199412588673714L;
@@ -20,6 +31,9 @@ public class CustomUserDetails extends User implements UserDetails {
 		this.password = user.getPassword();
 	}
 
+	/**
+	 * This list can be used for role based authorization.
+	 */
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return List.of();

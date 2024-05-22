@@ -11,7 +11,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.custom.common.utilities.exception.CommonException;
 import com.custom.sharewise.authentication.CustomUserDetails;
 import com.custom.sharewise.authentication.JwtService;
 import com.custom.sharewise.model.User;
@@ -20,6 +23,7 @@ import com.custom.sharewise.request.LoginRequest;
 import com.custom.sharewise.request.SignUpRequest;
 
 @Service
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = CommonException.class, transactionManager = "transactionManager")
 public class AuthenticationServiceImpl implements AuthenticationService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationServiceImpl.class);
