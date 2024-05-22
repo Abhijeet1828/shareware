@@ -22,27 +22,30 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.custom.sharewise.authentication.UserDetailsServiceImpl;
 import com.custom.sharewise.filter.JwtAuthFilter;
+import com.custom.sharewise.repository.UserRepository;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
 
 	private final JwtAuthFilter jwtAuthFilter;
+	private final UserRepository userRepository;
 
-	public SecurityConfiguration(JwtAuthFilter jwtAuthFilter) {
+	public SecurityConfiguration(JwtAuthFilter jwtAuthFilter, UserRepository userRepository) {
 		this.jwtAuthFilter = jwtAuthFilter;
+		this.userRepository = userRepository;
 	}
 
 	@Bean
 	UserDetailsService userDetailsService() {
-		return new UserDetailsServiceImpl();
+		return new UserDetailsServiceImpl(userRepository);
 	}
 
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf(csrf -> csrf.disable()).cors(cors -> cors.configurationSource(corsConfigurationSource()))
-				.authorizeHttpRequests(
-						auth -> auth.requestMatchers("/auth/**", "/actuator/**").permitAll().anyRequest().authenticated())
+				.authorizeHttpRequests(auth -> auth.requestMatchers("/auth/**", "/actuator/**").permitAll().anyRequest()
+						.authenticated())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authenticationProvider(authenticationProvider())
 				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

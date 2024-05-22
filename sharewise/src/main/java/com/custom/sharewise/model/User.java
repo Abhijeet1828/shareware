@@ -42,7 +42,7 @@ public class User extends BaseModel implements Serializable {
 	private String lastName;
 
 	@Column(name = "mobile_no", nullable = false)
-	private Long mobileNumber;
+	private String mobileNumber;
 
 	@Column(name = "email", nullable = false)
 	private String email;

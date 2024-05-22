@@ -1,0 +1,76 @@
++--------------------+--------------+------+-----+-------------------+-----------------------------------------------+
+| Field              | Type         | Null | Key | Default           | Extra                                         |
++--------------------+--------------+------+-----+-------------------+-----------------------------------------------+
+| user_id            | int          | NO   | PRI | NULL              | auto_increment                                |
+| first_name         | varchar(100) | YES  |     | NULL              |                                               |
+| last_name          | varchar(100) | YES  |     | NULL              |                                               |
+| mobile_no          | bigint       | NO   |     | NULL              |                                               |
+| email              | varchar(100) | NO   |     | NULL              |                                               |
+| created_timestamp  | timestamp    | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED                             |
+| modified_timestamp | timestamp    | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED on update CURRENT_TIMESTAMP |
++--------------------+--------------+------+-----+-------------------+-----------------------------------------------+
+
++--------------------+--------------+------+-----+-------------------+-----------------------------------------------+
+| Field              | Type         | Null | Key | Default           | Extra                                         |
++--------------------+--------------+------+-----+-------------------+-----------------------------------------------+
+| group_id           | int          | NO   | PRI | NULL              | auto_increment                                |
+| name               | varchar(500) | NO   |     | NULL              |                                               |
+| description        | mediumtext   | YES  |     | NULL              |                                               |
+| is_active          | tinyint(1)   | YES  |     | 1                 |                                               |
+| created_timestamp  | timestamp    | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED                             |
+| modified_timestamp | timestamp    | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED on update CURRENT_TIMESTAMP |
++--------------------+--------------+------+-----+-------------------+-----------------------------------------------+
+
++-----------------------+------------+------+-----+-------------------+-----------------------------------------------+
+| Field                 | Type       | Null | Key | Default           | Extra                                         |
++-----------------------+------------+------+-----+-------------------+-----------------------------------------------+
+| user_group_mapping_id | int        | NO   | PRI | NULL              | auto_increment                                |
+| user_id               | int        | NO   |     | NULL              |                                               |
+| group_id              | int        | NO   |     | NULL              |                                               |
+| is_removed            | tinyint(1) | YES  |     | 0                 |                                               |
+| created_timestamp     | timestamp  | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED                             |
+| modified_timestamp    | timestamp  | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED on update CURRENT_TIMESTAMP |
++-----------------------+------------+------+-----+-------------------+-----------------------------------------------+
+
++--------------------+--------------+------+-----+-------------------+-----------------------------------------------+
+| Field              | Type         | Null | Key | Default           | Extra                                         |
++--------------------+--------------+------+-----+-------------------+-----------------------------------------------+
+| group_expenses_id  | int          | NO   | PRI | NULL              | auto_increment                                |
+| group_id           | int          | NO   |     | NULL              |                                               |
+| paid_by            | int          | NO   |     | NULL              |                                               |
+| split_between      | varchar(500) | NO   |     | NULL              |                                               |
+| total_amount       | float(11,3)  | NO   |     | NULL              |                                               |
+| category           | varchar(100) | YES  |     | NULL              |                                               |
+| is_deleted         | tinyint(1)   | YES  |     | 0                 |                                               |
+| created_timestamp  | timestamp    | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED                             |
+| modified_timestamp | timestamp    | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED on update CURRENT_TIMESTAMP |
++--------------------+--------------+------+-----+-------------------+-----------------------------------------------+
+
++-----------------------+-------------+------+-----+-------------------+-----------------------------------------------+
+| Field                 | Type        | Null | Key | Default           | Extra                                         |
++-----------------------+-------------+------+-----+-------------------+-----------------------------------------------+
+| group_transactions_id | int         | NO   | PRI | NULL              | auto_increment                                |
+| group_id              | int         | NO   |     | NULL              |                                               |
+| group_expenses_id     | int         | YES  |     | NULL              |                                               |
+| paid_by               | int         | NO   |     | NULL              |                                               |
+| paid_to               | int         | NO   |     | NULL              |                                               |
+| amount                | float(11,3) | NO   |     | NULL              |                                               |
+| transaction_type      | varchar(20) | YES  |     | NULL              |                                               |
+| is_deleted            | tinyint(1)  | YES  |     | NULL              |                                               |
+| created_timestamp     | timestamp   | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED                             |
+| modified_timestamp    | timestamp   | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED on update CURRENT_TIMESTAMP |
++-----------------------+-------------+------+-----+-------------------+-----------------------------------------------+
+
++-----------------------+--------------+------+-----+-------------------+-----------------------------------------------+
+| Field                 | Type         | Null | Key | Default           | Extra                                         |
++-----------------------+--------------+------+-----+-------------------+-----------------------------------------------+
+| master_tx_details_id  | int          | NO   | PRI | NULL              | auto_increment                                |
+| group_id              | int          | YES  |     | NULL              |                                               |
+| created_by            | int          | YES  |     | NULL              |                                               |
+| request_type          | varchar(100) | YES  |     | NULL              |                                               |
+| group_expenses_id     | int          | YES  |     | NULL              |                                               |
+| group_transactions_id | int          | YES  |     | NULL              |                                               |
+| request               | longtext     | YES  |     | NULL              |                                               |
+| created_timestamp     | timestamp    | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED                             |
+| modified_timestamp    | timestamp    | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED on update CURRENT_TIMESTAMP |
++-----------------------+--------------+------+-----+-------------------+-----------------------------------------------+
