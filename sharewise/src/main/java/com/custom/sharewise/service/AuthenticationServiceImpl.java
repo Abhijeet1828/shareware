@@ -44,8 +44,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 
 	@Override
-	public User userSignUp(SignUpRequest signUpRequest) {
+	public Object userSignUp(SignUpRequest signUpRequest) {
 		try {
+			if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+				LOGGER.error("User with emailID - {} already exists", signUpRequest.getEmail());
+				return 1;
+			}
+
 			modelMapper.typeMap(SignUpRequest.class, User.class).addMappings(mapper -> mapper.skip(User::setPassword));
 
 			User newUser = modelMapper.map(signUpRequest, User.class);
@@ -57,7 +62,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			return userRepository.save(newUser);
 		} catch (Exception e) {
 			LOGGER.error("Exception in userSignUp", e);
-			return null;
+			return 2;
 		}
 	}
 
@@ -69,10 +74,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			if (authentication.isAuthenticated()) {
 				Optional<User> loggedInUser = userRepository.findByEmail(loginRequest.getEmail());
 				if (loggedInUser.isPresent()) {
+					LOGGER.info("UserId {} authenticated", loggedInUser.get().getUserId());
 					return jwtService.generateToken(new CustomUserDetails(loggedInUser.get()));
 				}
 			}
 
+			LOGGER.error("User not authenticated with email {}", loginRequest.getEmail());
 			return 1;
 		} catch (Exception e) {
 			LOGGER.error("Exception in userLogin", e);

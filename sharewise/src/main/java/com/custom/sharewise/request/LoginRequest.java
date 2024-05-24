@@ -15,11 +15,11 @@ import lombok.ToString;
 @NoArgsConstructor
 public class LoginRequest {
 
-	@Email
-	@NotBlank
+	@Email(message = "EmailID field should have well-formatted email")
+	@NotBlank(message = "EmailID field cannot be blank")
 	private String email;
 
-	@NotBlank
+	@NotBlank(message = "Password field cannot be blank")
 	private String password;
 
 }

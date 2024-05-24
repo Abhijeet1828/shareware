@@ -1,11 +1,9 @@
 package com.custom.sharewise.controller;
 
 import java.util.Map;
-import java.util.Objects;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +14,6 @@ import com.custom.common.utilities.response.ResponseHelper;
 import com.custom.sharewise.constants.Constants;
 import com.custom.sharewise.constants.FailureConstants;
 import com.custom.sharewise.constants.SuccessConstants;
-import com.custom.sharewise.model.User;
 import com.custom.sharewise.request.LoginRequest;
 import com.custom.sharewise.request.SignUpRequest;
 import com.custom.sharewise.service.AuthenticationService;
@@ -25,7 +22,6 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping(value = Constants.AUTHENTICATION_CONTROLLER + Constants.API_VERSION_1)
-@Validated
 public class AuthenticationController {
 
 	private final AuthenticationService authenticationService;
@@ -36,14 +32,26 @@ public class AuthenticationController {
 
 	@PostMapping(value = "/sign-up")
 	public ResponseEntity<Object> userSignUp(@RequestBody @Valid SignUpRequest signUpRequest) {
-		User newUser = authenticationService.userSignUp(signUpRequest);
+		Object response = authenticationService.userSignUp(signUpRequest);
 
-		if (Objects.nonNull(newUser)) {
-			return ResponseHelper.generateResponse(SuccessConstants.USER_SIGN_UP.getSuccessCode(),
-					SuccessConstants.USER_SIGN_UP.getSuccessMsg(), newUser);
+		if (response instanceof Integer i) {
+			if (i == 1) {
+				return ResponseHelper.generateResponse(
+						new CommonResponse(FailureConstants.USER_ALREADY_EXISTS.getFailureCode(),
+								FailureConstants.USER_ALREADY_EXISTS.getFailureMsg()),
+						HttpStatus.INTERNAL_SERVER_ERROR);
+			} else {
+				return ResponseHelper
+						.generateResponse(
+								new CommonResponse(FailureConstants.SIGN_UP_ERROR.getFailureCode(),
+										FailureConstants.SIGN_UP_ERROR.getFailureMsg()),
+								HttpStatus.INTERNAL_SERVER_ERROR);
+			}
 		}
-		return ResponseHelper.generateResponse(new CommonResponse(FailureConstants.SIGN_UP_ERROR.getFailureCode(),
-				FailureConstants.SIGN_UP_ERROR.getFailureMsg()), HttpStatus.INTERNAL_SERVER_ERROR);
+
+		return ResponseHelper.generateResponse(SuccessConstants.USER_SIGN_UP.getSuccessCode(),
+				SuccessConstants.USER_SIGN_UP.getSuccessMsg(), response);
+
 	}
 
 	@PostMapping(value = "/login")

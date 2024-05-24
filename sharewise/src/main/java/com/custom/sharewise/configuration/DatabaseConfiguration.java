@@ -54,13 +54,13 @@ public class DatabaseConfiguration {
 		hikariDataSource.setPassword(env.getProperty("spring.datasource.password"));
 		hikariDataSource.setMaximumPoolSize(env.getProperty("spring.datasource.max-active", Integer.class));
 		hikariDataSource.setMinimumIdle(env.getProperty("spring.datasource.max-idle", Integer.class));
-		hikariDataSource.setConnectionTestQuery(env.getProperty("spring.datasource.validationQuery"));
-		hikariDataSource.setConnectionTimeout(env.getProperty("spring.datasource.connectionTimeout", Long.class));
-		hikariDataSource.setIdleTimeout(env.getProperty("spring.datasource.idleTimeout", Long.class));
-		hikariDataSource.setMaxLifetime(env.getProperty("spring.datasource.maxLifetime", Long.class));
-		hikariDataSource.setAutoCommit(env.getProperty("spring.datasource.autoCommit", Boolean.class));
+		hikariDataSource.setConnectionTestQuery(env.getProperty("spring.datasource.validation-query"));
+		hikariDataSource.setConnectionTimeout(env.getProperty("spring.datasource.connection-timeout", Long.class));
+		hikariDataSource.setIdleTimeout(env.getProperty("spring.datasource.idle-timeout", Long.class));
+		hikariDataSource.setMaxLifetime(env.getProperty("spring.datasource.max-lifetime", Long.class));
+		hikariDataSource.setAutoCommit(env.getProperty("spring.datasource.auto-commit", Boolean.class));
 		hikariDataSource
-				.setLeakDetectionThreshold(env.getProperty("spring.datasource.leakDetectionThreshold", Long.class));
+				.setLeakDetectionThreshold(env.getProperty("spring.datasource.leak-detection-threshold", Long.class));
 		return hikariDataSource;
 	}
 
