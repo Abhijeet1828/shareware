@@ -12,5 +12,7 @@ public final class Constants {
 	
 	// Controller Mapping Constants
 	public static final String AUTHENTICATION_CONTROLLER = "/auth";
+	public static final String USER_CONTROLLER = "/user";
+	
 
 }

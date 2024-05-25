@@ -13,7 +13,8 @@ public enum FailureConstants {
 	INTERNAL_SERVER_ERROR(-1999, "Oops! Looks like something went wrong."),
 	SIGN_UP_ERROR(-2000, "Error while creating user"),
 	LOGIN_ERROR(-2001, "Error while logging in"),
-	USER_ALREADY_EXISTS(-2002, "User already exists with the emailID");
+	USER_ALREADY_EXISTS(-2002, "User already exists with the emailID"),
+	UPDATE_USER_ERROR(-2003, "Error while updating user details");
 
 	private final int failureCode;
 	private final String failureMsg;

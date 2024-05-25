@@ -8,6 +8,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.custom.sharewise.model.User;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
 /**
  * This is a custom user details class which is used for Spring Security
  * authentication. This is required by Spring Security to authenticate user by
@@ -19,6 +25,11 @@ import com.custom.sharewise.model.User;
  * @author Abhijeet
  *
  */
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
+@Getter
+@ToString
 public class CustomUserDetails extends User implements UserDetails {
 
 	private static final long serialVersionUID = 4583199412588673714L;
