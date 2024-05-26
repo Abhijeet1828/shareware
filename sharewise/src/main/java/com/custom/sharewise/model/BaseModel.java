@@ -1,5 +1,6 @@
 package com.custom.sharewise.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import jakarta.persistence.Column;
@@ -16,7 +17,9 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class BaseModel {
+public class BaseModel implements Serializable {
+
+	private static final long serialVersionUID = -3092227495244829010L;
 
 	@Column(name = "created_timestamp")
 	@Temporal(TemporalType.TIMESTAMP)

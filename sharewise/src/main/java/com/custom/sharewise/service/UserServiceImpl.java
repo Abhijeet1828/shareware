@@ -3,6 +3,7 @@ package com.custom.sharewise.service;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +12,7 @@ import com.custom.common.utilities.exception.CommonException;
 import com.custom.sharewise.authentication.CustomUserDetails;
 import com.custom.sharewise.model.User;
 import com.custom.sharewise.repository.UserRepository;
+import com.custom.sharewise.request.UpdatePasswordRequest;
 import com.custom.sharewise.request.UpdateUserRequest;
 
 @Service
@@ -21,10 +23,12 @@ public class UserServiceImpl implements UserService {
 
 	private final UserRepository userRepository;
 	private final ModelMapper modelMapper;
+	private final PasswordEncoder passwordEncoder;
 
-	public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper) {
+	public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder) {
 		this.userRepository = userRepository;
 		this.modelMapper = modelMapper;
+		this.passwordEncoder = passwordEncoder;
 	}
 
 	@Override
@@ -39,6 +43,25 @@ public class UserServiceImpl implements UserService {
 			return userRepository.save(existingUser);
 		} catch (Exception e) {
 			LOGGER.error("Exception in updateUser", e);
+			return 2;
+		}
+	}
+
+	@Override
+	public Integer updatePassword(UpdatePasswordRequest updatePasswordRequest, CustomUserDetails userDetails) {
+		try {
+			if (!passwordEncoder.matches(updatePasswordRequest.getOldPassword(), userDetails.getPassword())) {
+				LOGGER.error("Old Passwords do not match");
+				return 0;
+			}
+
+			User existingUser = userRepository.findByEmail(userDetails.getEmail()).orElseThrow();
+			existingUser.setPassword(passwordEncoder.encode(updatePasswordRequest.getNewPassword()));
+
+			userRepository.save(existingUser);
+			return 1;
+		} catch (Exception e) {
+			LOGGER.error("Exception in updatePassword", e);
 			return 2;
 		}
 	}

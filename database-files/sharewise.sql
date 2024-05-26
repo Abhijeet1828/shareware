@@ -1,13 +1,22 @@
 CREATE TABLE `user` (
-	`user_id` INT AUTO_INCREMENT,
+	`user_id` BIGINT AUTO_INCREMENT,
 	`user_password` VARCHAR(255),
-	`first_name` VARCHAR(100),
-	`last_name` VARCHAR(100),
-	`mobile_no` BIGINT NOT NULL,
-	`email` VARCHAR(100) NOT NULL,
+	`first_name` VARCHAR(255),
+	`last_name` VARCHAR(255),
+	`mobile_no` VARCHAR(255) NOT NULL,
+	`email` VARCHAR(255) NOT NULL,
 	`created_timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	`modified_timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	PRIMARY KEY (`user_id`)
+);
+
+CREATE TABLE `user_roles` (
+	`user_roles_id` BIGINT AUTO_INCREMENT,
+	`user_id` BIGINT NOT NULL,
+	`role` VARCHAR(255) NOT NULL,
+	`created_timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	`modified_timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	PRIMARY KEY (`user_roles_id`)
 );
 
 CREATE TABLE `user_groups` (

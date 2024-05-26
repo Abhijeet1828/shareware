@@ -14,6 +14,7 @@ import com.custom.sharewise.authentication.CustomUserDetails;
 import com.custom.sharewise.constants.Constants;
 import com.custom.sharewise.constants.FailureConstants;
 import com.custom.sharewise.constants.SuccessConstants;
+import com.custom.sharewise.request.UpdatePasswordRequest;
 import com.custom.sharewise.request.UpdateUserRequest;
 import com.custom.sharewise.service.UserService;
 
@@ -43,6 +44,24 @@ public class UserController {
 
 		return ResponseHelper.generateResponse(SuccessConstants.UPDATE_USER.getSuccessCode(),
 				SuccessConstants.UPDATE_USER.getSuccessMsg(), response);
+	}
+
+	@PutMapping(value = "/update-password")
+	public ResponseEntity<Object> updatePassword(@RequestBody @Valid UpdatePasswordRequest updatePasswordRequest,
+			@AuthenticationPrincipal CustomUserDetails userDetails) {
+		Integer response = userService.updatePassword(updatePasswordRequest, userDetails);
+
+		switch (response) {
+		case 0:
+			return ResponseHelper.generateResponse(FailureConstants.PASSWORDS_DO_NOT_MATCH.getFailureCode(),
+					FailureConstants.PASSWORDS_DO_NOT_MATCH.getFailureMsg(), HttpStatus.UNAUTHORIZED);
+		case 1:
+			return ResponseHelper.generateResponse(SuccessConstants.UPDATE_PASSWORD.getSuccessCode(),
+					SuccessConstants.UPDATE_PASSWORD.getSuccessMsg());
+		default:
+			return ResponseHelper.generateResponse(FailureConstants.INTERNAL_SERVER_ERROR.getFailureCode(),
+					FailureConstants.INTERNAL_SERVER_ERROR.getFailureMsg(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 }

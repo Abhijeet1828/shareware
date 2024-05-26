@@ -1,12 +1,15 @@
 package com.custom.sharewise.authentication;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.custom.sharewise.model.User;
+import com.custom.sharewise.model.UserRoles;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -36,10 +39,18 @@ public class CustomUserDetails extends User implements UserDetails {
 
 	private String username;
 	private String password;
+	private Collection<? extends GrantedAuthority> authorities;
 
 	public CustomUserDetails(User user) {
 		this.username = user.getEmail();
 		this.password = user.getPassword();
+
+		List<GrantedAuthority> auths = new ArrayList<>();
+		for (UserRoles userRole : user.getRoles()) {
+			auths.add(new SimpleGrantedAuthority(userRole.getRole()));
+		}
+		this.authorities = auths;
+
 	}
 
 	/**
@@ -47,7 +58,7 @@ public class CustomUserDetails extends User implements UserDetails {
 	 */
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return List.of();
+		return authorities;
 	}
 
 	@Override

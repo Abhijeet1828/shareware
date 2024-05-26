@@ -1,15 +1,21 @@
 package com.custom.sharewise.model;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -31,7 +37,7 @@ public class User extends BaseModel implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "user_id")
 	private Long userId;
-	
+
 	@Column(name = "user_password")
 	private String password;
 
@@ -46,5 +52,10 @@ public class User extends BaseModel implements Serializable {
 
 	@Column(name = "email", nullable = false)
 	private String email;
+
+	@Default
+	@OneToMany(fetch = FetchType.EAGER, targetEntity = UserRoles.class)
+	@JoinColumn(name = "user_id", referencedColumnName = "user_id")
+	private Set<UserRoles> roles = new HashSet<>();
 
 }
