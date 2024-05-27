@@ -1,8 +1,11 @@
 package com.custom.sharewise.service;
 
+import java.util.Date;
+
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -10,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.custom.common.utilities.exception.CommonException;
 import com.custom.sharewise.authentication.CustomUserDetails;
+import com.custom.sharewise.constants.FailureConstants;
 import com.custom.sharewise.model.User;
 import com.custom.sharewise.repository.UserRepository;
 import com.custom.sharewise.request.UpdatePasswordRequest;
@@ -32,23 +36,28 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Object updateUser(UpdateUserRequest updateUserRequest, CustomUserDetails userDetails) {
+	public Object updateUser(UpdateUserRequest updateUserRequest, CustomUserDetails userDetails)
+			throws CommonException {
 		try {
 			User existingUser = userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
 			modelMapper.getConfiguration().setSkipNullEnabled(true);
 			modelMapper.typeMap(UpdateUserRequest.class, User.class);
 
 			modelMapper.map(updateUserRequest, existingUser);
+			existingUser.setModifiedTimestamp(new Date());
 
 			return userRepository.save(existingUser);
 		} catch (Exception e) {
 			LOGGER.error("Exception in updateUser", e);
-			return 2;
+			throw new CommonException(FailureConstants.UPDATE_USER_ERROR.getFailureCode(),
+					FailureConstants.UPDATE_USER_ERROR.getFailureMsg());
 		}
 	}
 
+	@CacheEvict(value = "users", key = "#userDetails.username")
 	@Override
-	public Integer updatePassword(UpdatePasswordRequest updatePasswordRequest, CustomUserDetails userDetails) {
+	public Integer updatePassword(UpdatePasswordRequest updatePasswordRequest, CustomUserDetails userDetails)
+			throws CommonException {
 		try {
 			if (!passwordEncoder.matches(updatePasswordRequest.getOldPassword(), userDetails.getPassword())) {
 				LOGGER.error("Old Passwords do not match");
@@ -57,12 +66,14 @@ public class UserServiceImpl implements UserService {
 
 			User existingUser = userRepository.findByEmail(userDetails.getEmail()).orElseThrow();
 			existingUser.setPassword(passwordEncoder.encode(updatePasswordRequest.getNewPassword()));
+			existingUser.setModifiedTimestamp(new Date());
 
 			userRepository.save(existingUser);
 			return 1;
 		} catch (Exception e) {
 			LOGGER.error("Exception in updatePassword", e);
-			return 2;
+			throw new CommonException(FailureConstants.INTERNAL_SERVER_ERROR.getFailureCode(),
+					FailureConstants.INTERNAL_SERVER_ERROR.getFailureMsg());
 		}
 	}
 

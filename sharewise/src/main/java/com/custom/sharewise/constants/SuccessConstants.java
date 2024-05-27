@@ -12,7 +12,8 @@ public enum SuccessConstants {
 	USER_SIGN_UP(2000, "User signed up successfully"),
 	USER_LOGIN(2001, "User logged in successfully"),
 	UPDATE_USER(2002, "User details updated successfully"),
-	UPDATE_PASSWORD(2003, "Password updated successfully");
+	UPDATE_PASSWORD(2003, "Password updated successfully"),
+	CREATE_GROUP(2004, "Group created successfully");
 
 	private final int successCode;
 	private final String successMsg;

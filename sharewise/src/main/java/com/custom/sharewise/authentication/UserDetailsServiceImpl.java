@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -38,6 +39,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	 * the application. This method is used by Spring Security for loading users and
 	 * authenticating them later on.
 	 */
+	@Cacheable(value = "users", key = "#username")
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		LOGGER.info("Entering in loadUserByUsername method");

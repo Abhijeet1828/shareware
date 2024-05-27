@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.custom.common.utilities.exception.CommonException;
 import com.custom.sharewise.authentication.CustomUserDetails;
 import com.custom.sharewise.authentication.JwtService;
+import com.custom.sharewise.constants.FailureConstants;
 import com.custom.sharewise.model.User;
 import com.custom.sharewise.repository.UserRepository;
 import com.custom.sharewise.request.LoginRequest;
@@ -44,7 +45,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 
 	@Override
-	public Object userSignUp(SignUpRequest signUpRequest) {
+	public Object userSignUp(SignUpRequest signUpRequest) throws CommonException {
 		try {
 			if (userRepository.existsByEmail(signUpRequest.getEmail())) {
 				LOGGER.error("User with emailID - {} already exists", signUpRequest.getEmail());
@@ -62,12 +63,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			return userRepository.save(newUser);
 		} catch (Exception e) {
 			LOGGER.error("Exception in userSignUp", e);
-			return 2;
+			throw new CommonException(FailureConstants.SIGN_UP_ERROR.getFailureCode(),
+					FailureConstants.SIGN_UP_ERROR.getFailureMsg());
 		}
 	}
 
 	@Override
-	public Object userLogin(LoginRequest loginRequest) {
+	public Object userLogin(LoginRequest loginRequest) throws CommonException {
 		try {
 			Authentication authentication = authenticationManager.authenticate(
 					new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
@@ -83,7 +85,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			return 1;
 		} catch (Exception e) {
 			LOGGER.error("Exception in userLogin", e);
-			return 2;
+			throw new CommonException(FailureConstants.LOGIN_ERROR.getFailureCode(),
+						FailureConstants.LOGIN_ERROR.getFailureMsg());
 		}
 	}
 

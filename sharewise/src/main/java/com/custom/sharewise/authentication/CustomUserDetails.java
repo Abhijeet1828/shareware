@@ -37,6 +37,7 @@ public class CustomUserDetails extends User implements UserDetails {
 
 	private static final long serialVersionUID = 4583199412588673714L;
 
+	private Long userId;
 	private String username;
 	private String password;
 	private Collection<? extends GrantedAuthority> authorities;
@@ -44,6 +45,7 @@ public class CustomUserDetails extends User implements UserDetails {
 	public CustomUserDetails(User user) {
 		this.username = user.getEmail();
 		this.password = user.getPassword();
+		this.userId = user.getUserId();
 
 		List<GrantedAuthority> auths = new ArrayList<>();
 		for (UserRoles userRole : user.getRoles()) {

@@ -15,7 +15,10 @@ public enum FailureConstants {
 	LOGIN_ERROR(-2001, "Error while logging in"),
 	USER_ALREADY_EXISTS(-2002, "User already exists with the emailID"),
 	UPDATE_USER_ERROR(-2003, "Error while updating user details"),
-	PASSWORDS_DO_NOT_MATCH(-2004, "Passwords do not match");
+	PASSWORDS_DO_NOT_MATCH(-2004, "Passwords do not match"),
+	ADD_USER_TO_GROUP_ERROR(-2005, "Error while adding user to the group"),
+	ADD_ROLE_FOR_USER_ERROR(-2006, "Error while adding role to the user"),
+	CREATE_GROUP_ERROR(-2007, "Error while creating group");
 
 	private final int failureCode;
 	private final String failureMsg;

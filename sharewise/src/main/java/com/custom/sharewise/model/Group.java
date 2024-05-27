@@ -37,6 +37,9 @@ public class Group extends BaseModel implements Serializable {
 
 	@Column(name = "description")
 	private String description;
+	
+	@Column(name = "created_by")
+	private Long createdBy;
 
 	@Column(name = "is_active")
 	private Boolean isActive;
