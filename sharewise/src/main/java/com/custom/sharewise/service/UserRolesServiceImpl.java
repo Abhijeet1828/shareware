@@ -26,14 +26,13 @@ public class UserRolesServiceImpl implements UserRolesService {
 	}
 
 	@Override
-	public boolean addRoleForUser(Long userId, String role) throws CommonException {
+	public void addRoleForUser(Long userId, String role) throws CommonException {
 		try {
 			UserRoles userRoles = UserRoles.builder().userId(userId).role(role).build();
 			userRoles.setCreatedTimestamp(new Date());
 			userRoles.setModifiedTimestamp(new Date());
 
 			userRolesRepository.save(userRoles);
-			return true;
 		} catch (Exception e) {
 			LOGGER.error("Exception in addRoleForUser", e);
 			throw new CommonException(FailureConstants.ADD_ROLE_FOR_USER_ERROR.getFailureCode(),

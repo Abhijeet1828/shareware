@@ -21,7 +21,11 @@ public enum FailureConstants {
 	CREATE_GROUP_ERROR(-2007, "Error while creating group"),
 	UPDATE_GROUP_ERROR(-2008, "Error while updating group details"),
 	USER_NOT_GROUP_ADMIN(-2009, "User does not have privileges to edit the group details"),
-	DELETE_GROUP_ERROR(-2010, "Error while deleting group");
+	DELETE_GROUP_ERROR(-2010, "Error while deleting group"),
+	GROUP_NOT_FOUND(-2011, "No existing group found"),
+	USER_NOT_MAPPED_TO_GROUP(-2012, "User is not mapped to the group"),
+	USER_NOT_FOUND(-2013, "User not found"),
+	REMOVE_USER_FROM_GROUP_ERROR(-2014, "Error while removing user from the group");
 
 	private final int failureCode;
 	private final String failureMsg;

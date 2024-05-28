@@ -28,11 +28,12 @@ import lombok.ToString;
  * @author Abhijeet
  *
  */
+
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Setter
-@Getter
-@ToString
 public class CustomUserDetails extends User implements UserDetails {
 
 	private static final long serialVersionUID = 4583199412588673714L;

@@ -77,9 +77,10 @@ public class AuthenticationController {
 			return ResponseHelper.generateResponse(new CommonResponse(FailureConstants.LOGIN_ERROR.getFailureCode(),
 					FailureConstants.LOGIN_ERROR.getFailureMsg()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+
 		return ResponseHelper.generateResponse(SuccessConstants.USER_LOGIN.getSuccessCode(),
 				SuccessConstants.USER_LOGIN.getSuccessMsg(),
-				LoginResponse.builder().email(loginRequest.getEmail()).token(response.toString()).build());
+				new LoginResponse(loginRequest.getEmail(), response.toString()));
 	}
 
 }

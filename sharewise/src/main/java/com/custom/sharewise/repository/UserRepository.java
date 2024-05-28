@@ -11,6 +11,8 @@ import com.custom.sharewise.model.User;
 public interface UserRepository extends JpaRepository<User, Long> {
 
 	Optional<User> findByEmail(String email);
-	
+
 	boolean existsByEmail(String email);
+
+	boolean existsByUserId(Long userId);
 }

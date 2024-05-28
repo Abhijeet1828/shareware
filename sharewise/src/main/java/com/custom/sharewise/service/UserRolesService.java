@@ -4,6 +4,6 @@ import com.custom.common.utilities.exception.CommonException;
 
 public interface UserRolesService {
 	
-	public boolean addRoleForUser(Long userId, String role) throws CommonException;
+	public void addRoleForUser(Long userId, String role) throws CommonException;
 
 }
