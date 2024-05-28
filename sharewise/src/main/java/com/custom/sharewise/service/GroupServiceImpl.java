@@ -16,7 +16,7 @@ import com.custom.sharewise.constants.Constants;
 import com.custom.sharewise.constants.FailureConstants;
 import com.custom.sharewise.model.Group;
 import com.custom.sharewise.repository.GroupRepository;
-import com.custom.sharewise.request.CreateGroupRequest;
+import com.custom.sharewise.request.CreateOrUpdateGroupRequest;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = CommonException.class, transactionManager = "transactionManager")
@@ -39,10 +39,12 @@ public class GroupServiceImpl implements GroupService {
 
 	@CacheEvict(value = "users", key = "#userDetails.username")
 	@Override
-	public Object createGroup(CreateGroupRequest createGroupRequest, CustomUserDetails userDetails)
+	public Object createGroup(CreateOrUpdateGroupRequest createGroupRequest, CustomUserDetails userDetails)
 			throws CommonException {
 		try {
-			modelMapper.typeMap(CreateGroupRequest.class, Group.class);
+			modelMapper.getConfiguration().setSkipNullEnabled(true);
+			modelMapper.typeMap(CreateOrUpdateGroupRequest.class, Group.class)
+					.addMappings(mapper -> mapper.skip(Group::setGroupId));
 			Group group = modelMapper.map(createGroupRequest, Group.class);
 			group.setCreatedBy(userDetails.getUserId());
 			group.setCreatedTimestamp(new Date());
@@ -60,6 +62,54 @@ public class GroupServiceImpl implements GroupService {
 			LOGGER.error("Exception in createGroup", e);
 			throw new CommonException(FailureConstants.CREATE_GROUP_ERROR.getFailureCode(),
 					FailureConstants.CREATE_GROUP_ERROR.getFailureMsg());
+		}
+	}
+
+	@Override
+	public Object updateGroup(CreateOrUpdateGroupRequest updateGroupRequest, CustomUserDetails userDetails)
+			throws CommonException {
+		try {
+			Group existingGroup = groupRepository.findById(updateGroupRequest.getGroupId()).orElseThrow();
+			if (!existingGroup.getCreatedBy().equals(userDetails.getUserId())) {
+				LOGGER.error("Unauthorized! UserId {} is not the admin of the GroupId {}", userDetails.getUserId(),
+						existingGroup.getGroupId());
+				return 1;
+			}
+
+			modelMapper.getConfiguration().setSkipNullEnabled(true);
+			modelMapper.typeMap(CreateOrUpdateGroupRequest.class, Group.class)
+					.addMappings(mapper -> mapper.skip(Group::setGroupId));
+			modelMapper.map(updateGroupRequest, existingGroup);
+
+			existingGroup.setModifiedTimestamp(new Date());
+
+			return groupRepository.save(existingGroup);
+		} catch (Exception e) {
+			LOGGER.error("Exception in updateGroup", e);
+			throw new CommonException(FailureConstants.UPDATE_GROUP_ERROR.getFailureCode(),
+					FailureConstants.UPDATE_GROUP_ERROR.getFailureMsg());
+		}
+	}
+
+	@Override
+	public int deleteGroup(Long groupId, CustomUserDetails userDetails) throws CommonException {
+		try {
+			Group existingGroup = groupRepository.findById(groupId).orElseThrow();
+			if (!existingGroup.getCreatedBy().equals(userDetails.getUserId())) {
+				LOGGER.error("Unauthorized! UserId {} is not the admin of the GroupId {}", userDetails.getUserId(),
+						existingGroup.getGroupId());
+				return 1;
+			}
+
+			existingGroup.setIsActive(false);
+			existingGroup.setModifiedTimestamp(new Date());
+
+			groupRepository.save(existingGroup);
+			return 2;
+		} catch (Exception e) {
+			LOGGER.error("Exception in deleteGroup", e);
+			throw new CommonException(FailureConstants.DELETE_GROUP_ERROR.getFailureCode(),
+					FailureConstants.DELETE_GROUP_ERROR.getFailureMsg());
 		}
 	}
 

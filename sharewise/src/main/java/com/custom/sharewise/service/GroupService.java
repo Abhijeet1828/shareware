@@ -2,11 +2,16 @@ package com.custom.sharewise.service;
 
 import com.custom.common.utilities.exception.CommonException;
 import com.custom.sharewise.authentication.CustomUserDetails;
-import com.custom.sharewise.request.CreateGroupRequest;
+import com.custom.sharewise.request.CreateOrUpdateGroupRequest;
 
 public interface GroupService {
 
-	public Object createGroup(CreateGroupRequest createGroupRequest, CustomUserDetails userDetails)
+	public Object createGroup(CreateOrUpdateGroupRequest createGroupRequest, CustomUserDetails userDetails)
 			throws CommonException;
+
+	public Object updateGroup(CreateOrUpdateGroupRequest updateGroupRequest, CustomUserDetails userDetails)
+			throws CommonException;
+
+	public int deleteGroup(Long groupId, CustomUserDetails userDetails) throws CommonException;
 
 }

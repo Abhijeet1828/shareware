@@ -14,6 +14,7 @@ public final class Constants {
 	public static final String AUTHENTICATION_CONTROLLER = "/auth";
 	public static final String USER_CONTROLLER = "/user";
 	public static final String GROUP_CONTROLLER = "/group";
+	public static final String GROUP_MEMBER_CONTROLLER = "/group-member";
 
 	// User Roles
 	public static final String ROLE_ADMIN = "ROLE_ADMIN";

@@ -18,7 +18,10 @@ public enum FailureConstants {
 	PASSWORDS_DO_NOT_MATCH(-2004, "Passwords do not match"),
 	ADD_USER_TO_GROUP_ERROR(-2005, "Error while adding user to the group"),
 	ADD_ROLE_FOR_USER_ERROR(-2006, "Error while adding role to the user"),
-	CREATE_GROUP_ERROR(-2007, "Error while creating group");
+	CREATE_GROUP_ERROR(-2007, "Error while creating group"),
+	UPDATE_GROUP_ERROR(-2008, "Error while updating group details"),
+	USER_NOT_GROUP_ADMIN(-2009, "User does not have privileges to edit the group details"),
+	DELETE_GROUP_ERROR(-2010, "Error while deleting group");
 
 	private final int failureCode;
 	private final String failureMsg;

@@ -7,5 +7,5 @@ import com.custom.sharewise.model.Group;
 
 @Repository
 public interface GroupRepository extends JpaRepository<Group, Long> {
-
+	
 }
