@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.custom.common.utilities.exception.CommonException;
+import com.custom.common.utilities.exception.UnauthorizedException;
 import com.custom.common.utilities.response.ResponseHelper;
 import com.custom.sharewise.authentication.CustomUserDetails;
 import com.custom.sharewise.constants.Constants;
@@ -34,7 +35,7 @@ public class GroupMemberController {
 	@PreAuthorize(value = "hasRole('ROLE_ADMIN')")
 	@PostMapping(value = "/add")
 	public ResponseEntity<Object> addMemberToGroup(@RequestBody @Valid AddOrRemoveMemberRequest addMemberRequest,
-			@AuthenticationPrincipal CustomUserDetails userDetails) throws CommonException {
+			@AuthenticationPrincipal CustomUserDetails userDetails) throws CommonException, UnauthorizedException {
 		userGroupMappingService.addUserToGroup(addMemberRequest.getGroupId(), addMemberRequest.getUserId(),
 				userDetails);
 
@@ -46,8 +47,11 @@ public class GroupMemberController {
 	@DeleteMapping(value = "/remove")
 	public ResponseEntity<Object> removeMemberFromGroup(
 			@RequestBody @Valid AddOrRemoveMemberRequest removeMemberRequest,
-			@AuthenticationPrincipal CustomUserDetails userDetails) {
-		return null;
+			@AuthenticationPrincipal CustomUserDetails userDetails) throws CommonException, UnauthorizedException {
+		userGroupMappingService.removeUserFromGroup(removeMemberRequest.getGroupId(), removeMemberRequest.getUserId(),
+				userDetails);
+		return ResponseHelper.generateResponse(SuccessConstants.REMOVE_MEMBER_FROM_GROUP.getSuccessCode(),
+				SuccessConstants.REMOVE_MEMBER_FROM_GROUP.getSuccessMsg());
 	}
 
 }

@@ -1,6 +1,7 @@
 package com.custom.sharewise.service;
 
 import java.util.Date;
+import java.util.Map;
 
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -11,12 +12,15 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.custom.common.utilities.exception.CommonException;
+import com.custom.common.utilities.exception.UnauthorizedException;
 import com.custom.sharewise.authentication.CustomUserDetails;
 import com.custom.sharewise.constants.Constants;
 import com.custom.sharewise.constants.FailureConstants;
+import com.custom.sharewise.dto.UserGroupDto;
 import com.custom.sharewise.model.Group;
 import com.custom.sharewise.repository.GroupRepository;
 import com.custom.sharewise.request.CreateOrUpdateGroupRequest;
+import com.custom.sharewise.validation.BusinessValidationService;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = CommonException.class, transactionManager = "transactionManager")
@@ -27,13 +31,16 @@ public class GroupServiceImpl implements GroupService {
 	private final GroupRepository groupRepository;
 	private final UserGroupMappingService userGroupMappingService;
 	private final UserRolesService userRolesService;
+	private final BusinessValidationService businessValidationService;
 	private final ModelMapper modelMapper;
 
 	public GroupServiceImpl(GroupRepository groupRepository, UserGroupMappingService userGroupMappingService,
-			UserRolesService userRolesService, ModelMapper modelMapper) {
+			UserRolesService userRolesService, BusinessValidationService businessValidationService,
+			ModelMapper modelMapper) {
 		this.groupRepository = groupRepository;
 		this.userGroupMappingService = userGroupMappingService;
 		this.userRolesService = userRolesService;
+		this.businessValidationService = businessValidationService;
 		this.modelMapper = modelMapper;
 	}
 
@@ -60,21 +67,24 @@ public class GroupServiceImpl implements GroupService {
 			return group;
 		} catch (Exception e) {
 			LOGGER.error("Exception in createGroup", e);
-			throw new CommonException(FailureConstants.CREATE_GROUP_ERROR.getFailureCode(),
-					FailureConstants.CREATE_GROUP_ERROR.getFailureMsg());
+			if (e instanceof CommonException ce)
+				throw ce;
+			else
+				throw new CommonException(FailureConstants.CREATE_GROUP_ERROR.getFailureCode(),
+						FailureConstants.CREATE_GROUP_ERROR.getFailureMsg());
 		}
 	}
 
 	@Override
 	public Object updateGroup(CreateOrUpdateGroupRequest updateGroupRequest, CustomUserDetails userDetails)
-			throws CommonException {
+			throws CommonException, UnauthorizedException {
 		try {
-			Group existingGroup = groupRepository.findById(updateGroupRequest.getGroupId()).orElseThrow();
-			if (!existingGroup.getCreatedBy().equals(userDetails.getUserId())) {
-				LOGGER.error("Unauthorized! UserId {} is not the admin of the GroupId {}", userDetails.getUserId(),
-						existingGroup.getGroupId());
-				return 1;
-			}
+			Group existingGroup = groupRepository.findById(updateGroupRequest.getGroupId())
+					.orElseThrow(() -> new CommonException(FailureConstants.GROUP_NOT_FOUND.getFailureCode(),
+							FailureConstants.GROUP_NOT_FOUND.getFailureMsg()));
+
+			businessValidationService.validate(Map.of(Constants.VALIDATION_GROUP_ADMIN,
+					new UserGroupDto(existingGroup.getGroupId(), userDetails.getUserId())));
 
 			modelMapper.getConfiguration().setSkipNullEnabled(true);
 			modelMapper.typeMap(CreateOrUpdateGroupRequest.class, Group.class)
@@ -86,30 +96,37 @@ public class GroupServiceImpl implements GroupService {
 			return groupRepository.save(existingGroup);
 		} catch (Exception e) {
 			LOGGER.error("Exception in updateGroup", e);
-			throw new CommonException(FailureConstants.UPDATE_GROUP_ERROR.getFailureCode(),
+			switch (e) {
+			case CommonException ce -> throw ce;
+			case UnauthorizedException au -> throw au;
+			default -> throw new CommonException(FailureConstants.UPDATE_GROUP_ERROR.getFailureCode(),
 					FailureConstants.UPDATE_GROUP_ERROR.getFailureMsg());
+			}
 		}
 	}
 
 	@Override
-	public int deleteGroup(Long groupId, CustomUserDetails userDetails) throws CommonException {
+	public void deleteGroup(Long groupId, CustomUserDetails userDetails) throws CommonException, UnauthorizedException {
 		try {
-			Group existingGroup = groupRepository.findById(groupId).orElseThrow();
-			if (!existingGroup.getCreatedBy().equals(userDetails.getUserId())) {
-				LOGGER.error("Unauthorized! UserId {} is not the admin of the GroupId {}", userDetails.getUserId(),
-						existingGroup.getGroupId());
-				return 1;
-			}
+			Group existingGroup = groupRepository.findById(groupId)
+					.orElseThrow(() -> new CommonException(FailureConstants.GROUP_NOT_FOUND.getFailureCode(),
+							FailureConstants.GROUP_NOT_FOUND.getFailureMsg()));
+
+			businessValidationService.validate(Map.of(Constants.VALIDATION_GROUP_ADMIN,
+					new UserGroupDto(existingGroup.getGroupId(), userDetails.getUserId())));
 
 			existingGroup.setIsActive(false);
 			existingGroup.setModifiedTimestamp(new Date());
 
 			groupRepository.save(existingGroup);
-			return 2;
 		} catch (Exception e) {
 			LOGGER.error("Exception in deleteGroup", e);
-			throw new CommonException(FailureConstants.DELETE_GROUP_ERROR.getFailureCode(),
+			switch (e) {
+			case CommonException ce -> throw ce;
+			case UnauthorizedException au -> throw au;
+			default -> throw new CommonException(FailureConstants.DELETE_GROUP_ERROR.getFailureCode(),
 					FailureConstants.DELETE_GROUP_ERROR.getFailureMsg());
+			}
 		}
 	}
 

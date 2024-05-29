@@ -18,4 +18,10 @@ public final class Constants {
 
 	// User Roles
 	public static final String ROLE_ADMIN = "ROLE_ADMIN";
+	
+	// Validation Type Constants
+	public static final String VALIDATION_USER_ID = "userId";
+	public static final String VALIDATION_GROUP_ID = "groupId";
+	public static final String VALIDATION_GROUP_ADMIN = "groupAdmin";
+	
 }

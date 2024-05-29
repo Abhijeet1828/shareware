@@ -16,7 +16,8 @@ public enum SuccessConstants {
 	CREATE_GROUP(2004, "Group created successfully"),
 	UPDATE_GROUP(2005, "Group details updated successfully"),
 	DELETE_GROUP(2006, "Group deleted successfully"),
-	ADD_MEMBER_TO_GROUP(2007, "User added to the group successfully");
+	ADD_MEMBER_TO_GROUP(2007, "User added to the group successfully"),
+	REMOVE_MEMBER_FROM_GROUP(2008, "User removed from the group successfully");
 
 	private final int successCode;
 	private final String successMsg;

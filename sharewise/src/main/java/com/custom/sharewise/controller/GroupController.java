@@ -1,6 +1,5 @@
 package com.custom.sharewise.controller;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,10 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.custom.common.utilities.exception.CommonException;
+import com.custom.common.utilities.exception.UnauthorizedException;
 import com.custom.common.utilities.response.ResponseHelper;
 import com.custom.sharewise.authentication.CustomUserDetails;
 import com.custom.sharewise.constants.Constants;
-import com.custom.sharewise.constants.FailureConstants;
 import com.custom.sharewise.constants.SuccessConstants;
 import com.custom.sharewise.request.CreateOrUpdateGroupRequest;
 import com.custom.sharewise.service.GroupService;
@@ -53,13 +52,8 @@ public class GroupController {
 	@PreAuthorize(value = "hasRole('ROLE_ADMIN')")
 	@PutMapping(value = "/update")
 	public ResponseEntity<Object> updateGroup(@RequestBody @Valid CreateOrUpdateGroupRequest updateGroupRequest,
-			@AuthenticationPrincipal CustomUserDetails userDetails) throws CommonException {
+			@AuthenticationPrincipal CustomUserDetails userDetails) throws CommonException, UnauthorizedException {
 		Object response = groupService.updateGroup(updateGroupRequest, userDetails);
-
-		if (response instanceof Integer) {
-			return ResponseHelper.generateResponse(FailureConstants.USER_NOT_GROUP_ADMIN.getFailureCode(),
-					FailureConstants.USER_NOT_GROUP_ADMIN.getFailureMsg(), HttpStatus.UNAUTHORIZED);
-		}
 
 		return ResponseHelper.generateResponse(SuccessConstants.UPDATE_GROUP.getSuccessCode(),
 				SuccessConstants.UPDATE_GROUP.getSuccessMsg(), response);
@@ -69,13 +63,8 @@ public class GroupController {
 	@DeleteMapping(value = "/delete/{id}")
 	public ResponseEntity<Object> deleteGroup(
 			@NotNull @Positive @PathVariable(value = "id", required = true) Long groupId,
-			@AuthenticationPrincipal CustomUserDetails userDetails) throws CommonException {
-		int response = groupService.deleteGroup(groupId, userDetails);
-
-		if (response == 1) {
-			return ResponseHelper.generateResponse(FailureConstants.USER_NOT_GROUP_ADMIN.getFailureCode(),
-					FailureConstants.USER_NOT_GROUP_ADMIN.getFailureMsg(), HttpStatus.UNAUTHORIZED);
-		}
+			@AuthenticationPrincipal CustomUserDetails userDetails) throws CommonException, UnauthorizedException {
+		groupService.deleteGroup(groupId, userDetails);
 
 		return ResponseHelper.generateResponse(SuccessConstants.DELETE_GROUP.getSuccessCode(),
 				SuccessConstants.DELETE_GROUP.getSuccessMsg());
