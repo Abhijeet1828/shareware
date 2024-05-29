@@ -1,6 +1,5 @@
 package com.custom.sharewise.controller;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -8,10 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.custom.common.utilities.exception.CommonException;
-import com.custom.common.utilities.response.CommonResponse;
 import com.custom.common.utilities.response.ResponseHelper;
 import com.custom.sharewise.constants.Constants;
-import com.custom.sharewise.constants.FailureConstants;
 import com.custom.sharewise.constants.SuccessConstants;
 import com.custom.sharewise.model.User;
 import com.custom.sharewise.request.LoginRequest;
@@ -53,13 +50,6 @@ public class AuthenticationController {
 	public ResponseEntity<Object> userSignUp(@RequestBody @Valid SignUpRequest signUpRequest) throws CommonException {
 		Object response = authenticationService.userSignUp(signUpRequest);
 
-		if (response instanceof Integer) {
-			return ResponseHelper
-					.generateResponse(
-							new CommonResponse(FailureConstants.USER_ALREADY_EXISTS.getFailureCode(),
-									FailureConstants.USER_ALREADY_EXISTS.getFailureMsg()),
-							HttpStatus.INTERNAL_SERVER_ERROR);
-		}
 		return ResponseHelper.generateResponse(SuccessConstants.USER_SIGN_UP.getSuccessCode(),
 				SuccessConstants.USER_SIGN_UP.getSuccessMsg(), response);
 
@@ -70,13 +60,8 @@ public class AuthenticationController {
 	@ApiResponse(responseCode = "200", description = "Logged in successfully", content = {
 			@Content(mediaType = "application/json", schema = @Schema(implementation = LoginResponse.class)) })
 	@PostMapping(value = "/login")
-	public ResponseEntity<Object> userLogin(@RequestBody @Valid LoginRequest loginRequest) throws CommonException {
+	public ResponseEntity<Object> userLogin(@RequestBody @Valid LoginRequest loginRequest) {
 		Object response = authenticationService.userLogin(loginRequest);
-
-		if (response instanceof Integer) {
-			return ResponseHelper.generateResponse(new CommonResponse(FailureConstants.LOGIN_ERROR.getFailureCode(),
-					FailureConstants.LOGIN_ERROR.getFailureMsg()), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
 
 		return ResponseHelper.generateResponse(SuccessConstants.USER_LOGIN.getSuccessCode(),
 				SuccessConstants.USER_LOGIN.getSuccessMsg(),

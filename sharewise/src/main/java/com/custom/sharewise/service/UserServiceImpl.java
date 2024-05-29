@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.custom.common.utilities.exception.CommonException;
+import com.custom.common.utilities.exception.UnauthorizedException;
 import com.custom.sharewise.authentication.CustomUserDetails;
 import com.custom.sharewise.constants.FailureConstants;
 import com.custom.sharewise.model.User;
@@ -39,7 +40,10 @@ public class UserServiceImpl implements UserService {
 	public Object updateUser(UpdateUserRequest updateUserRequest, CustomUserDetails userDetails)
 			throws CommonException {
 		try {
-			User existingUser = userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
+			User existingUser = userRepository.findByEmail(userDetails.getUsername())
+					.orElseThrow(() -> new CommonException(FailureConstants.USER_NOT_FOUND.getFailureCode(),
+							FailureConstants.USER_NOT_FOUND.getFailureMsg()));
+
 			modelMapper.getConfiguration().setSkipNullEnabled(true);
 			modelMapper.typeMap(UpdateUserRequest.class, User.class);
 
@@ -49,19 +53,23 @@ public class UserServiceImpl implements UserService {
 			return userRepository.save(existingUser);
 		} catch (Exception e) {
 			LOGGER.error("Exception in updateUser", e);
-			throw new CommonException(FailureConstants.UPDATE_USER_ERROR.getFailureCode(),
-					FailureConstants.UPDATE_USER_ERROR.getFailureMsg());
+			if (e instanceof CommonException ce)
+				throw ce;
+			else
+				throw new CommonException(FailureConstants.UPDATE_USER_ERROR.getFailureCode(),
+						FailureConstants.UPDATE_USER_ERROR.getFailureMsg());
 		}
 	}
 
 	@CacheEvict(value = "users", key = "#userDetails.username")
 	@Override
-	public Integer updatePassword(UpdatePasswordRequest updatePasswordRequest, CustomUserDetails userDetails)
-			throws CommonException {
+	public void updatePassword(UpdatePasswordRequest updatePasswordRequest, CustomUserDetails userDetails)
+			throws CommonException, UnauthorizedException {
 		try {
 			if (!passwordEncoder.matches(updatePasswordRequest.getOldPassword(), userDetails.getPassword())) {
 				LOGGER.error("Old Passwords do not match");
-				return 0;
+				throw new UnauthorizedException(FailureConstants.PASSWORDS_DO_NOT_MATCH.getFailureCode(),
+						FailureConstants.PASSWORDS_DO_NOT_MATCH.getFailureMsg());
 			}
 
 			User existingUser = userRepository.findByEmail(userDetails.getEmail()).orElseThrow();
@@ -69,11 +77,14 @@ public class UserServiceImpl implements UserService {
 			existingUser.setModifiedTimestamp(new Date());
 
 			userRepository.save(existingUser);
-			return 1;
 		} catch (Exception e) {
 			LOGGER.error("Exception in updatePassword", e);
-			throw new CommonException(FailureConstants.INTERNAL_SERVER_ERROR.getFailureCode(),
+			switch (e) {
+			case CommonException ce -> throw ce;
+			case UnauthorizedException au -> throw au;
+			default -> throw new CommonException(FailureConstants.INTERNAL_SERVER_ERROR.getFailureCode(),
 					FailureConstants.INTERNAL_SERVER_ERROR.getFailureMsg());
+			}
 		}
 	}
 

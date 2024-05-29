@@ -1,6 +1,5 @@
 package com.custom.sharewise.controller;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -9,10 +8,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.custom.common.utilities.exception.CommonException;
+import com.custom.common.utilities.exception.UnauthorizedException;
 import com.custom.common.utilities.response.ResponseHelper;
 import com.custom.sharewise.authentication.CustomUserDetails;
 import com.custom.sharewise.constants.Constants;
-import com.custom.sharewise.constants.FailureConstants;
 import com.custom.sharewise.constants.SuccessConstants;
 import com.custom.sharewise.request.UpdatePasswordRequest;
 import com.custom.sharewise.request.UpdateUserRequest;
@@ -41,16 +40,12 @@ public class UserController {
 
 	@PutMapping(value = "/update-password")
 	public ResponseEntity<Object> updatePassword(@RequestBody @Valid UpdatePasswordRequest updatePasswordRequest,
-			@AuthenticationPrincipal CustomUserDetails userDetails) throws CommonException {
-		Integer response = userService.updatePassword(updatePasswordRequest, userDetails);
+			@AuthenticationPrincipal CustomUserDetails userDetails) throws CommonException, UnauthorizedException {
+		userService.updatePassword(updatePasswordRequest, userDetails);
 
-		if (response == 0) {
-			return ResponseHelper.generateResponse(FailureConstants.PASSWORDS_DO_NOT_MATCH.getFailureCode(),
-					FailureConstants.PASSWORDS_DO_NOT_MATCH.getFailureMsg(), HttpStatus.UNAUTHORIZED);
-		} else {
-			return ResponseHelper.generateResponse(SuccessConstants.UPDATE_PASSWORD.getSuccessCode(),
-					SuccessConstants.UPDATE_PASSWORD.getSuccessMsg());
-		}
+		return ResponseHelper.generateResponse(SuccessConstants.UPDATE_PASSWORD.getSuccessCode(),
+				SuccessConstants.UPDATE_PASSWORD.getSuccessMsg());
+
 	}
 
 }

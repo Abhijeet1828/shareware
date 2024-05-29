@@ -8,6 +8,6 @@ public interface AuthenticationService {
 	
 	public Object userSignUp(SignUpRequest signUpRequest) throws CommonException;
 	
-	public Object userLogin(LoginRequest loginRequest) throws CommonException;
+	public Object userLogin(LoginRequest loginRequest);
 
 }

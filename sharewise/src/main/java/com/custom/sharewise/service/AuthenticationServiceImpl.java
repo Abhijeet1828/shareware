@@ -1,7 +1,6 @@
 package com.custom.sharewise.service;
 
 import java.util.Date;
-import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -49,7 +48,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		try {
 			if (userRepository.existsByEmail(signUpRequest.getEmail())) {
 				LOGGER.error("User with emailID - {} already exists", signUpRequest.getEmail());
-				return 1;
+				throw new CommonException(FailureConstants.USER_ALREADY_EXISTS.getFailureCode(),
+						FailureConstants.USER_ALREADY_EXISTS.getFailureMsg());
 			}
 
 			modelMapper.typeMap(SignUpRequest.class, User.class).addMappings(mapper -> mapper.skip(User::setPassword));
@@ -63,31 +63,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			return userRepository.save(newUser);
 		} catch (Exception e) {
 			LOGGER.error("Exception in userSignUp", e);
-			throw new CommonException(FailureConstants.SIGN_UP_ERROR.getFailureCode(),
-					FailureConstants.SIGN_UP_ERROR.getFailureMsg());
+			if (e instanceof CommonException ce)
+				throw ce;
+			else
+				throw new CommonException(FailureConstants.SIGN_UP_ERROR.getFailureCode(),
+						FailureConstants.SIGN_UP_ERROR.getFailureMsg());
 		}
 	}
 
 	@Override
-	public Object userLogin(LoginRequest loginRequest) throws CommonException {
-		try {
-			Authentication authentication = authenticationManager.authenticate(
-					new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
-			if (authentication.isAuthenticated()) {
-				Optional<User> loggedInUser = userRepository.findByEmail(loginRequest.getEmail());
-				if (loggedInUser.isPresent()) {
-					LOGGER.info("UserId {} authenticated", loggedInUser.get().getUserId());
-					return jwtService.generateToken(new CustomUserDetails(loggedInUser.get()));
-				}
-			}
-
-			LOGGER.error("User not authenticated with email {}", loginRequest.getEmail());
-			return 1;
-		} catch (Exception e) {
-			LOGGER.error("Exception in userLogin", e);
-			throw new CommonException(FailureConstants.LOGIN_ERROR.getFailureCode(),
-						FailureConstants.LOGIN_ERROR.getFailureMsg());
-		}
+	public Object userLogin(LoginRequest loginRequest) {
+		Authentication authentication = authenticationManager.authenticate(
+				new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+		return jwtService.generateToken((CustomUserDetails) authentication.getPrincipal());
 	}
 
 }
