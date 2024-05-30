@@ -18,16 +18,14 @@ import com.custom.sharewise.request.UpdateUserRequest;
 import com.custom.sharewise.service.UserService;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping(value = Constants.USER_CONTROLLER + Constants.API_VERSION_1)
 public class UserController {
 
 	private final UserService userService;
-
-	public UserController(UserService userService) {
-		this.userService = userService;
-	}
 
 	@PutMapping(value = "/update")
 	public ResponseEntity<Object> updateUser(@RequestBody @Valid UpdateUserRequest updateUserRequest,

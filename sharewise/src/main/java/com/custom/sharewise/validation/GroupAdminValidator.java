@@ -9,14 +9,13 @@ import com.custom.sharewise.constants.FailureConstants;
 import com.custom.sharewise.dto.UserGroupDto;
 import com.custom.sharewise.repository.GroupRepository;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Component
 public class GroupAdminValidator implements BusinessValidator {
 
 	private final GroupRepository groupRepository;
-
-	public GroupAdminValidator(GroupRepository groupRepository) {
-		this.groupRepository = groupRepository;
-	}
 
 	@Override
 	public void validate(Object value) throws CommonException, UnauthorizedException {

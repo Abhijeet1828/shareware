@@ -21,6 +21,9 @@ import com.custom.sharewise.model.UserGroupMapping;
 import com.custom.sharewise.repository.UserGroupMappingRepository;
 import com.custom.sharewise.validation.BusinessValidationService;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = { CommonException.class,
 		UnauthorizedException.class }, transactionManager = "transactionManager")
@@ -30,12 +33,6 @@ public class UserGroupMappingServiceImpl implements UserGroupMappingService {
 
 	private final UserGroupMappingRepository userGroupMappingRepository;
 	private final BusinessValidationService businessValidationService;
-
-	public UserGroupMappingServiceImpl(UserGroupMappingRepository userGroupMappingRepository,
-			BusinessValidationService businessValidationService) {
-		this.userGroupMappingRepository = userGroupMappingRepository;
-		this.businessValidationService = businessValidationService;
-	}
 
 	@Override
 	public void addUserToGroup(Long groupId, Long userId) throws CommonException {

@@ -20,6 +20,9 @@ import com.custom.sharewise.repository.UserRepository;
 import com.custom.sharewise.request.UpdatePasswordRequest;
 import com.custom.sharewise.request.UpdateUserRequest;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = { CommonException.class,
 		UnauthorizedException.class }, transactionManager = "transactionManager")
@@ -30,12 +33,6 @@ public class UserServiceImpl implements UserService {
 	private final UserRepository userRepository;
 	private final ModelMapper modelMapper;
 	private final PasswordEncoder passwordEncoder;
-
-	public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder) {
-		this.userRepository = userRepository;
-		this.modelMapper = modelMapper;
-		this.passwordEncoder = passwordEncoder;
-	}
 
 	@Override
 	public Object updateUser(UpdateUserRequest updateUserRequest, CustomUserDetails userDetails)

@@ -22,6 +22,9 @@ import com.custom.sharewise.repository.GroupRepository;
 import com.custom.sharewise.request.CreateOrUpdateGroupRequest;
 import com.custom.sharewise.validation.BusinessValidationService;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = { CommonException.class,
 		UnauthorizedException.class }, transactionManager = "transactionManager")
@@ -34,16 +37,6 @@ public class GroupServiceImpl implements GroupService {
 	private final UserRolesService userRolesService;
 	private final BusinessValidationService businessValidationService;
 	private final ModelMapper modelMapper;
-
-	public GroupServiceImpl(GroupRepository groupRepository, UserGroupMappingService userGroupMappingService,
-			UserRolesService userRolesService, BusinessValidationService businessValidationService,
-			ModelMapper modelMapper) {
-		this.groupRepository = groupRepository;
-		this.userGroupMappingService = userGroupMappingService;
-		this.userRolesService = userRolesService;
-		this.businessValidationService = businessValidationService;
-		this.modelMapper = modelMapper;
-	}
 
 	@CacheEvict(value = "users", key = "#userDetails.username")
 	@Override

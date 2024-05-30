@@ -26,17 +26,15 @@ import com.custom.sharewise.validation.OnUpdate;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Validated
 @RestController
 @RequestMapping(value = Constants.GROUP_CONTROLLER + Constants.API_VERSION_1)
 public class GroupController {
 
 	private final GroupService groupService;
-
-	public GroupController(GroupService groupService) {
-		this.groupService = groupService;
-	}
 
 	@Validated(value = OnCreate.class)
 	@PostMapping(value = "/create")

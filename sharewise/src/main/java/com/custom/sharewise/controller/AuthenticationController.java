@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 /**
  * This controller is used for authentication purposes such as SignUp and Login.
@@ -32,15 +33,12 @@ import jakarta.validation.Valid;
  * @author Abhijeet
  *
  */
+@RequiredArgsConstructor
 @RestController
 @RequestMapping(value = Constants.AUTHENTICATION_CONTROLLER + Constants.API_VERSION_1)
 public class AuthenticationController {
 
 	private final AuthenticationService authenticationService;
-
-	public AuthenticationController(AuthenticationService authenticationService) {
-		this.authenticationService = authenticationService;
-	}
 
 	@Tag(name = "post", description = "POST methods of Authentication Controller")
 	@Operation(summary = "User Sign-Up API", description = "The API creates a user with the given details")

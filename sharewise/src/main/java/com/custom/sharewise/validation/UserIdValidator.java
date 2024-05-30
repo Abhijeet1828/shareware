@@ -6,14 +6,13 @@ import com.custom.common.utilities.exception.CommonException;
 import com.custom.sharewise.constants.FailureConstants;
 import com.custom.sharewise.repository.UserRepository;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Component
 public class UserIdValidator implements BusinessValidator {
 
 	private final UserRepository userRepository;
-
-	public UserIdValidator(UserRepository userRepository) {
-		this.userRepository = userRepository;
-	}
 
 	@Override
 	public void validate(Object value) throws CommonException {

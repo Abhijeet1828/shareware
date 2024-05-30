@@ -20,17 +20,15 @@ import com.custom.sharewise.request.AddOrRemoveMemberRequest;
 import com.custom.sharewise.service.UserGroupMappingService;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Validated
 @RestController
 @RequestMapping(value = Constants.GROUP_MEMBER_CONTROLLER + Constants.API_VERSION_1)
 public class GroupMemberController {
 
 	private final UserGroupMappingService userGroupMappingService;
-
-	public GroupMemberController(UserGroupMappingService userGroupMappingService) {
-		this.userGroupMappingService = userGroupMappingService;
-	}
 
 	@PreAuthorize(value = "hasRole('ROLE_ADMIN')")
 	@PostMapping(value = "/add")

@@ -22,6 +22,9 @@ import com.custom.sharewise.repository.UserRepository;
 import com.custom.sharewise.request.LoginRequest;
 import com.custom.sharewise.request.SignUpRequest;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = CommonException.class, transactionManager = "transactionManager")
 public class AuthenticationServiceImpl implements AuthenticationService {
@@ -33,15 +36,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	private final PasswordEncoder passwordEncoder;
 	private final AuthenticationManager authenticationManager;
 	private final JwtService jwtService;
-
-	public AuthenticationServiceImpl(UserRepository userRepository, ModelMapper modelMapper,
-			PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtService jwtService) {
-		this.userRepository = userRepository;
-		this.modelMapper = modelMapper;
-		this.passwordEncoder = passwordEncoder;
-		this.authenticationManager = authenticationManager;
-		this.jwtService = jwtService;
-	}
 
 	@Override
 	public Object userSignUp(SignUpRequest signUpRequest) throws CommonException {

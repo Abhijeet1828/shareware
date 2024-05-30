@@ -14,6 +14,9 @@ import com.custom.sharewise.constants.FailureConstants;
 import com.custom.sharewise.model.UserRoles;
 import com.custom.sharewise.repository.UserRolesRepository;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = { CommonException.class,
 		UnauthorizedException.class }, transactionManager = "transactionManager")
@@ -22,10 +25,6 @@ public class UserRolesServiceImpl implements UserRolesService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserRolesServiceImpl.class);
 
 	private final UserRolesRepository userRolesRepository;
-
-	public UserRolesServiceImpl(UserRolesRepository userRolesRepository) {
-		this.userRolesRepository = userRolesRepository;
-	}
 
 	@Override
 	public void addRoleForUser(Long userId, String role) throws CommonException {
