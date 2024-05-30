@@ -15,13 +15,20 @@ public final class Constants {
 	public static final String USER_CONTROLLER = "/user";
 	public static final String GROUP_CONTROLLER = "/group";
 	public static final String GROUP_MEMBER_CONTROLLER = "/group-member";
+	public static final String EXPENSES_CONTROLLER = "/expenses";
+	public static final String SETTLE_CONTROLLER = "/settle";
 
 	// User Roles
 	public static final String ROLE_ADMIN = "ROLE_ADMIN";
-	
+
 	// Validation Type Constants
 	public static final String VALIDATION_USER_ID = "userId";
 	public static final String VALIDATION_GROUP_ID = "groupId";
 	public static final String VALIDATION_GROUP_ADMIN = "groupAdmin";
-	
+	public static final String VALIDATION_USER_GROUP = "userGroup";
+
+	// Transaction Types
+	public static final String TRANSACTION_TYPE_GROUP_EXPENSE = "GROUP_EXPENSE";
+	public static final String TRANSACTION_TYPE_USER_PAYMENT = "USER_PAYMENT";
+
 }

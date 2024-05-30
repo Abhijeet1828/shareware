@@ -45,7 +45,7 @@ public class GroupTransactions extends BaseModel implements Serializable {
 	@Column(name = "paid_to")
 	private Long paidTo;
 
-	@Column(name = "amount", precision = 11, scale = 3)
+	@Column(name = "amount", precision = 11, scale = 2)
 	private BigDecimal amount;
 
 	@Column(name = "transaction_type")

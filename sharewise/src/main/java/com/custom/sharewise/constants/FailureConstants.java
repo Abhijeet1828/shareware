@@ -25,7 +25,9 @@ public enum FailureConstants {
 	GROUP_NOT_FOUND(-2011, "No existing group found"),
 	USER_NOT_MAPPED_TO_GROUP(-2012, "User is not mapped to the group"),
 	USER_NOT_FOUND(-2013, "User not found"),
-	REMOVE_USER_FROM_GROUP_ERROR(-2014, "Error while removing user from the group");
+	REMOVE_USER_FROM_GROUP_ERROR(-2014, "Error while removing user from the group"),
+	ADD_GROUP_EXPENSE_ERROR(-2015, "Error while adding group expense"),
+	ADD_GROUP_TRANSACTION_ERROR(-2016, "Error while adding group transaction");
 
 	private final int failureCode;
 	private final String failureMsg;

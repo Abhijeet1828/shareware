@@ -9,12 +9,14 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.custom.common.utilities.exception.CommonException;
+import com.custom.common.utilities.exception.UnauthorizedException;
 import com.custom.sharewise.constants.FailureConstants;
 import com.custom.sharewise.model.UserRoles;
 import com.custom.sharewise.repository.UserRolesRepository;
 
 @Service
-@Transactional(propagation = Propagation.REQUIRED, rollbackFor = CommonException.class, transactionManager = "transactionManager")
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = { CommonException.class,
+		UnauthorizedException.class }, transactionManager = "transactionManager")
 public class UserRolesServiceImpl implements UserRolesService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserRolesServiceImpl.class);

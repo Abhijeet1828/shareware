@@ -12,4 +12,8 @@ public interface UserGroupMappingRepository extends JpaRepository<UserGroupMappi
 
 	Optional<UserGroupMapping> findFirstByGroupIdAndUserIdAndIsRemovedFalse(Long groupId, Long userId);
 
+	boolean existsByGroupIdAndUserIdAndIsRemovedFalse(Long groupId, Long userId);
+	
+	Optional<UserGroupMapping> findFirstByGroupIdAndUserId(Long groupId, Long userId);
+
 }

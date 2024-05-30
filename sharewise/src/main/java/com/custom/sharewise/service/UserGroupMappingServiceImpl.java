@@ -3,6 +3,7 @@ package com.custom.sharewise.service;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +22,8 @@ import com.custom.sharewise.repository.UserGroupMappingRepository;
 import com.custom.sharewise.validation.BusinessValidationService;
 
 @Service
-@Transactional(propagation = Propagation.REQUIRED, rollbackFor = CommonException.class, transactionManager = "transactionManager")
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = { CommonException.class,
+		UnauthorizedException.class }, transactionManager = "transactionManager")
 public class UserGroupMappingServiceImpl implements UserGroupMappingService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserGroupMappingServiceImpl.class);
@@ -53,11 +55,21 @@ public class UserGroupMappingServiceImpl implements UserGroupMappingService {
 			Map<String, Object> validations = new HashMap<>();
 			validations.put(Constants.VALIDATION_USER_ID, userId);
 			validations.put(Constants.VALIDATION_GROUP_ID, groupId);
-			validations.put(Constants.VALIDATION_GROUP_ADMIN, new UserGroupDto(groupId, userDetails.getUserId()));
+			validations.put(Constants.VALIDATION_GROUP_ADMIN, new UserGroupDto(groupId, userDetails.getUserId(), null));
 
 			businessValidationService.validate(validations);
 
-			createUserGroupMapping(groupId, userId);
+			Optional<UserGroupMapping> optUserGroupMapping = userGroupMappingRepository
+					.findFirstByGroupIdAndUserId(groupId, userId);
+			if (optUserGroupMapping.isPresent()) {
+				UserGroupMapping existingUserGroupMapping = optUserGroupMapping.get();
+				existingUserGroupMapping.setIsRemoved(false);
+				existingUserGroupMapping.setModifiedTimestamp(new Date());
+
+				userGroupMappingRepository.save(existingUserGroupMapping);
+			} else {
+				createUserGroupMapping(groupId, userId);
+			}
 		} catch (Exception e) {
 			LOGGER.error("Exception in addUserToGroup", e);
 			switch (e) {
@@ -76,7 +88,7 @@ public class UserGroupMappingServiceImpl implements UserGroupMappingService {
 			Map<String, Object> validations = new HashMap<>();
 			validations.put(Constants.VALIDATION_USER_ID, userId);
 			validations.put(Constants.VALIDATION_GROUP_ID, groupId);
-			validations.put(Constants.VALIDATION_GROUP_ADMIN, new UserGroupDto(groupId, userDetails.getUserId()));
+			validations.put(Constants.VALIDATION_GROUP_ADMIN, new UserGroupDto(groupId, userDetails.getUserId(), null));
 
 			businessValidationService.validate(validations);
 

@@ -23,7 +23,8 @@ import com.custom.sharewise.request.CreateOrUpdateGroupRequest;
 import com.custom.sharewise.validation.BusinessValidationService;
 
 @Service
-@Transactional(propagation = Propagation.REQUIRED, rollbackFor = CommonException.class, transactionManager = "transactionManager")
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = { CommonException.class,
+		UnauthorizedException.class }, transactionManager = "transactionManager")
 public class GroupServiceImpl implements GroupService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(GroupServiceImpl.class);
@@ -84,7 +85,7 @@ public class GroupServiceImpl implements GroupService {
 							FailureConstants.GROUP_NOT_FOUND.getFailureMsg()));
 
 			businessValidationService.validate(Map.of(Constants.VALIDATION_GROUP_ADMIN,
-					new UserGroupDto(existingGroup.getGroupId(), userDetails.getUserId())));
+					new UserGroupDto(existingGroup.getGroupId(), userDetails.getUserId(), null)));
 
 			modelMapper.getConfiguration().setSkipNullEnabled(true);
 			modelMapper.typeMap(CreateOrUpdateGroupRequest.class, Group.class)
@@ -113,7 +114,7 @@ public class GroupServiceImpl implements GroupService {
 							FailureConstants.GROUP_NOT_FOUND.getFailureMsg()));
 
 			businessValidationService.validate(Map.of(Constants.VALIDATION_GROUP_ADMIN,
-					new UserGroupDto(existingGroup.getGroupId(), userDetails.getUserId())));
+					new UserGroupDto(existingGroup.getGroupId(), userDetails.getUserId(), null)));
 
 			existingGroup.setIsActive(false);
 			existingGroup.setModifiedTimestamp(new Date());

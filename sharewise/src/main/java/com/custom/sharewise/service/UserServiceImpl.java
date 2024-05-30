@@ -21,7 +21,8 @@ import com.custom.sharewise.request.UpdatePasswordRequest;
 import com.custom.sharewise.request.UpdateUserRequest;
 
 @Service
-@Transactional(propagation = Propagation.REQUIRED, rollbackFor = CommonException.class, transactionManager = "transactionManager")
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = { CommonException.class,
+		UnauthorizedException.class }, transactionManager = "transactionManager")
 public class UserServiceImpl implements UserService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);

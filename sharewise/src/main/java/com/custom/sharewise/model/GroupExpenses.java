@@ -42,7 +42,7 @@ public class GroupExpenses extends BaseModel implements Serializable {
 	@Column(name = "split_between")
 	private String splitBetween;
 
-	@Column(name = "total_amount", precision = 11, scale = 3)
+	@Column(name = "total_amount", precision = 11, scale = 2)
 	private BigDecimal totalAmount;
 
 	@Column(name = "category")
