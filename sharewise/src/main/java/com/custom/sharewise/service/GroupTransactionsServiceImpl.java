@@ -22,7 +22,7 @@ import com.custom.sharewise.constants.FailureConstants;
 import com.custom.sharewise.dto.UserGroupDto;
 import com.custom.sharewise.model.GroupTransactions;
 import com.custom.sharewise.repository.GroupTransactionsRepository;
-import com.custom.sharewise.request.AddExpenseRequest;
+import com.custom.sharewise.request.AddOrUpdateExpenseRequest;
 import com.custom.sharewise.request.AddTransactionRequest;
 import com.custom.sharewise.validation.BusinessValidationService;
 
@@ -41,7 +41,8 @@ public class GroupTransactionsServiceImpl implements GroupTransactionsService {
 	private final ModelMapper modelMapper;
 
 	@Override
-	public void addGroupTransaction(AddExpenseRequest addExpenseRequest, Long groupExpensesId) throws CommonException {
+	public void addGroupTransaction(AddOrUpdateExpenseRequest addExpenseRequest, Long groupExpensesId)
+			throws CommonException {
 		try {
 			BigDecimal perPersonShare = addExpenseRequest.getTotalAmount()
 					.divide(new BigDecimal(addExpenseRequest.getSplitBetween().size()), 2, RoundingMode.UP);
@@ -99,6 +100,22 @@ public class GroupTransactionsServiceImpl implements GroupTransactionsService {
 			else
 				throw new CommonException(FailureConstants.ADD_GROUP_TRANSACTION_ERROR.getFailureCode(),
 						FailureConstants.ADD_GROUP_TRANSACTION_ERROR.getFailureMsg());
+		}
+	}
+
+	@Override
+	public void removeGroupTransactions(Long groupExpensesId) throws CommonException {
+		try {
+			Long deletedRecords = groupTransactionsRepository.deleteByGroupExpensesId(groupExpensesId);
+
+			LOGGER.info("Deleted {} records for GroupExpensesId {}", deletedRecords, groupExpensesId);
+		} catch (Exception e) {
+			LOGGER.error("Exception in removeGroupTransactions", e);
+			if (e instanceof CommonException ce)
+				throw ce;
+			else
+				throw new CommonException(FailureConstants.DELETE_GROUP_TRANSACTIONS_ERROR.getFailureCode(),
+						FailureConstants.DELETE_GROUP_TRANSACTIONS_ERROR.getFailureMsg());
 		}
 	}
 }

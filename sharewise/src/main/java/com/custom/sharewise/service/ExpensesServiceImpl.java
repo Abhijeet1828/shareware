@@ -19,7 +19,7 @@ import com.custom.sharewise.constants.FailureConstants;
 import com.custom.sharewise.dto.UserGroupDto;
 import com.custom.sharewise.model.GroupExpenses;
 import com.custom.sharewise.repository.GroupExpensesRepository;
-import com.custom.sharewise.request.AddExpenseRequest;
+import com.custom.sharewise.request.AddOrUpdateExpenseRequest;
 import com.custom.sharewise.validation.BusinessValidationService;
 
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,7 @@ public class ExpensesServiceImpl implements ExpensesService {
 	private final ModelMapper modelMapper;
 
 	@Override
-	public Object addExpense(AddExpenseRequest addExpenseRequest) throws CommonException {
+	public Object addExpense(AddOrUpdateExpenseRequest addExpenseRequest) throws CommonException {
 		try {
 			Map<String, Object> validations = new HashMap<>();
 			validations.put(Constants.VALIDATION_GROUP_ID, addExpenseRequest.getGroupId());
@@ -48,8 +48,10 @@ public class ExpensesServiceImpl implements ExpensesService {
 			businessValidationService.validate(validations);
 
 			modelMapper.getConfiguration().setSkipNullEnabled(true);
-			modelMapper.typeMap(AddExpenseRequest.class, GroupExpenses.class).addMappings(mapper -> mapper
-					.map(src -> StringUtils.join(src.getSplitBetween(), ","), GroupExpenses::setSplitBetween));
+			modelMapper.typeMap(AddOrUpdateExpenseRequest.class, GroupExpenses.class)
+					.addMappings(mapper -> mapper.map(src -> StringUtils.join(src.getSplitBetween(), ","),
+							GroupExpenses::setSplitBetween))
+					.addMappings(mapper -> mapper.skip(GroupExpenses::setGroupExpensesId));
 
 			GroupExpenses groupExpenses = modelMapper.map(addExpenseRequest, GroupExpenses.class);
 
@@ -71,6 +73,48 @@ public class ExpensesServiceImpl implements ExpensesService {
 						FailureConstants.ADD_GROUP_EXPENSE_ERROR.getFailureMsg());
 		}
 
+	}
+
+	@Override
+	public Object updateExpense(AddOrUpdateExpenseRequest updateExpenseRequest) throws CommonException {
+		try {
+			Map<String, Object> validations = new HashMap<>();
+			validations.put(Constants.VALIDATION_GROUP_ID, updateExpenseRequest.getGroupId());
+			validations.put(Constants.VALIDATION_USER_GROUP,
+					new UserGroupDto(updateExpenseRequest.getGroupId(), null, updateExpenseRequest.getSplitBetween()));
+
+			businessValidationService.validate(validations);
+
+			GroupExpenses existingGroupExpense = groupExpensesRepository
+					.findFirstByGroupExpensesIdAndIsDeletedFalse(updateExpenseRequest.getGroupExpensesId())
+					.orElseThrow(() -> new CommonException(FailureConstants.GROUP_EXPENSE_NOT_FOUND.getFailureCode(),
+							FailureConstants.GROUP_EXPENSE_NOT_FOUND.getFailureMsg()));
+
+			modelMapper.getConfiguration().setSkipNullEnabled(true);
+			modelMapper.typeMap(AddOrUpdateExpenseRequest.class, GroupExpenses.class)
+					.addMappings(mapper -> mapper.map(src -> StringUtils.join(src.getSplitBetween(), ","),
+							GroupExpenses::setSplitBetween))
+					.addMappings(mapper -> mapper.skip(GroupExpenses::setGroupExpensesId));
+
+			modelMapper.map(updateExpenseRequest, existingGroupExpense);
+			existingGroupExpense.setModifiedTimestamp(new Date());
+
+			existingGroupExpense = groupExpensesRepository.save(existingGroupExpense);
+
+			groupTransactionsService.removeGroupTransactions(existingGroupExpense.getGroupExpensesId());
+
+			groupTransactionsService.addGroupTransaction(updateExpenseRequest,
+					existingGroupExpense.getGroupExpensesId());
+
+			return existingGroupExpense;
+		} catch (Exception e) {
+			LOGGER.error("Exception in updateExpense", e);
+			if (e instanceof CommonException ce)
+				throw ce;
+			else
+				throw new CommonException(FailureConstants.UPDATE_GROUP_EXPENSE_ERROR.getFailureCode(),
+						FailureConstants.UPDATE_GROUP_EXPENSE_ERROR.getFailureMsg());
+		}
 	}
 
 }

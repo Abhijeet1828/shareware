@@ -27,7 +27,10 @@ public enum FailureConstants {
 	USER_NOT_FOUND(-2013, "User not found"),
 	REMOVE_USER_FROM_GROUP_ERROR(-2014, "Error while removing user from the group"),
 	ADD_GROUP_EXPENSE_ERROR(-2015, "Error while adding group expense"),
-	ADD_GROUP_TRANSACTION_ERROR(-2016, "Error while adding group transaction");
+	ADD_GROUP_TRANSACTION_ERROR(-2016, "Error while adding group transaction"),
+	GROUP_EXPENSE_NOT_FOUND(-2017, "Group expense not found"),
+	DELETE_GROUP_TRANSACTIONS_ERROR(-2018, "Error while deleting group transactions"),
+	UPDATE_GROUP_EXPENSE_ERROR(-2019, "Error while updating group expense");
 
 	private final int failureCode;
 	private final String failureMsg;
