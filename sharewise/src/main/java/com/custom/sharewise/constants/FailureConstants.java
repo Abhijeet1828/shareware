@@ -30,7 +30,10 @@ public enum FailureConstants {
 	ADD_GROUP_TRANSACTION_ERROR(-2016, "Error while adding group transaction"),
 	GROUP_EXPENSE_NOT_FOUND(-2017, "Group expense not found"),
 	DELETE_GROUP_TRANSACTIONS_ERROR(-2018, "Error while deleting group transactions"),
-	UPDATE_GROUP_EXPENSE_ERROR(-2019, "Error while updating group expense");
+	UPDATE_GROUP_EXPENSE_ERROR(-2019, "Error while updating group expense"),
+	DELETE_GROUP_EXPENSE_ERROR(-2020, "Error while deleting group expense"),
+	RESTORE_GROUP_TRANSACTION_ERROR(-2021, "Error while restoring group transactions"),
+	RESTORE_GROUP_EXPENSE_ERROR(-2022, "Error while restoring group expense");
 
 	private final int failureCode;
 	private final String failureMsg;

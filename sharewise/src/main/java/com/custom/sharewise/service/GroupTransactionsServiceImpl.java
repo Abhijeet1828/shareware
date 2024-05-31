@@ -111,11 +111,46 @@ public class GroupTransactionsServiceImpl implements GroupTransactionsService {
 			LOGGER.info("Deleted {} records for GroupExpensesId {}", deletedRecords, groupExpensesId);
 		} catch (Exception e) {
 			LOGGER.error("Exception in removeGroupTransactions", e);
-			if (e instanceof CommonException ce)
-				throw ce;
-			else
-				throw new CommonException(FailureConstants.DELETE_GROUP_TRANSACTIONS_ERROR.getFailureCode(),
-						FailureConstants.DELETE_GROUP_TRANSACTIONS_ERROR.getFailureMsg());
+			throw new CommonException(FailureConstants.DELETE_GROUP_TRANSACTIONS_ERROR.getFailureCode(),
+					FailureConstants.DELETE_GROUP_TRANSACTIONS_ERROR.getFailureMsg());
+		}
+	}
+
+	@Override
+	public void softDeleteGroupTransactions(Long groupExpensesId) throws CommonException {
+		try {
+			List<GroupTransactions> groupTransactionsList = groupTransactionsRepository
+					.findAllByGroupExpensesIdAndIsDeletedFalse(groupExpensesId);
+
+			for (GroupTransactions transaction : groupTransactionsList) {
+				transaction.setIsDeleted(true);
+				transaction.setModifiedTimestamp(new Date());
+			}
+
+			groupTransactionsRepository.saveAll(groupTransactionsList);
+		} catch (Exception e) {
+			LOGGER.error("Exception in softDeleteGroupTransactions", e);
+			throw new CommonException(FailureConstants.DELETE_GROUP_TRANSACTIONS_ERROR.getFailureCode(),
+					FailureConstants.DELETE_GROUP_TRANSACTIONS_ERROR.getFailureMsg());
+		}
+	}
+
+	@Override
+	public void restoreGroupTransaction(Long groupExpensesId) throws CommonException {
+		try {
+			List<GroupTransactions> groupTransactionsList = groupTransactionsRepository
+					.findAllByGroupExpensesIdAndIsDeletedTrue(groupExpensesId);
+
+			for (GroupTransactions transaction : groupTransactionsList) {
+				transaction.setIsDeleted(false);
+				transaction.setModifiedTimestamp(new Date());
+			}
+
+			groupTransactionsRepository.saveAll(groupTransactionsList);
+		} catch (Exception e) {
+			LOGGER.error("Exception in restoreGroupTransaction", e);
+			throw new CommonException(FailureConstants.RESTORE_GROUP_TRANSACTION_ERROR.getFailureCode(),
+					FailureConstants.RESTORE_GROUP_TRANSACTION_ERROR.getFailureMsg());
 		}
 	}
 }

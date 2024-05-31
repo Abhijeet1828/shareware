@@ -2,6 +2,7 @@ package com.custom.sharewise.service;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.custom.common.utilities.exception.CommonException;
 import com.custom.common.utilities.exception.UnauthorizedException;
+import com.custom.sharewise.authentication.CustomUserDetails;
 import com.custom.sharewise.constants.Constants;
 import com.custom.sharewise.constants.FailureConstants;
 import com.custom.sharewise.dto.UserGroupDto;
@@ -114,6 +116,60 @@ public class ExpensesServiceImpl implements ExpensesService {
 			else
 				throw new CommonException(FailureConstants.UPDATE_GROUP_EXPENSE_ERROR.getFailureCode(),
 						FailureConstants.UPDATE_GROUP_EXPENSE_ERROR.getFailureMsg());
+		}
+	}
+
+	@Override
+	public Object deleteExpense(Long groupExpensesId, CustomUserDetails userDetails) throws CommonException {
+		try {
+			GroupExpenses existingGroupExpense = groupExpensesRepository
+					.findFirstByGroupExpensesIdAndIsDeletedFalse(groupExpensesId)
+					.orElseThrow(() -> new CommonException(FailureConstants.GROUP_EXPENSE_NOT_FOUND.getFailureCode(),
+							FailureConstants.GROUP_EXPENSE_NOT_FOUND.getFailureMsg()));
+
+			businessValidationService.validate(Map.of(Constants.VALIDATION_USER_GROUP,
+					new UserGroupDto(existingGroupExpense.getGroupId(), null, List.of(userDetails.getUserId()))));
+
+			existingGroupExpense.setIsDeleted(true);
+			existingGroupExpense.setModifiedTimestamp(new Date());
+
+			groupTransactionsService.softDeleteGroupTransactions(groupExpensesId);
+
+			return groupExpensesRepository.save(existingGroupExpense);
+		} catch (Exception e) {
+			LOGGER.error("Exception in deleteExpense", e);
+			if (e instanceof CommonException ce)
+				throw ce;
+			else
+				throw new CommonException(FailureConstants.DELETE_GROUP_EXPENSE_ERROR.getFailureCode(),
+						FailureConstants.DELETE_GROUP_EXPENSE_ERROR.getFailureMsg());
+		}
+	}
+
+	@Override
+	public Object restoreExpense(Long groupExpensesId, CustomUserDetails userDetails) throws CommonException {
+		try {
+			GroupExpenses existingGroupExpense = groupExpensesRepository
+					.findFirstByGroupExpensesIdAndIsDeletedTrue(groupExpensesId)
+					.orElseThrow(() -> new CommonException(FailureConstants.GROUP_EXPENSE_NOT_FOUND.getFailureCode(),
+							FailureConstants.GROUP_EXPENSE_NOT_FOUND.getFailureMsg()));
+
+			businessValidationService.validate(Map.of(Constants.VALIDATION_USER_GROUP,
+					new UserGroupDto(existingGroupExpense.getGroupId(), null, List.of(userDetails.getUserId()))));
+
+			existingGroupExpense.setIsDeleted(false);
+			existingGroupExpense.setModifiedTimestamp(new Date());
+
+			groupTransactionsService.restoreGroupTransaction(groupExpensesId);
+
+			return groupExpensesRepository.save(existingGroupExpense);
+		} catch (Exception e) {
+			LOGGER.error("Exception in restoreExpense", e);
+			if (e instanceof CommonException ce)
+				throw ce;
+			else
+				throw new CommonException(FailureConstants.RESTORE_GROUP_EXPENSE_ERROR.getFailureCode(),
+						FailureConstants.RESTORE_GROUP_EXPENSE_ERROR.getFailureMsg());
 		}
 	}
 

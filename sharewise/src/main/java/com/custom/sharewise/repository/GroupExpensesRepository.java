@@ -12,4 +12,6 @@ public interface GroupExpensesRepository extends JpaRepository<GroupExpenses, Lo
 
 	Optional<GroupExpenses> findFirstByGroupExpensesIdAndIsDeletedFalse(Long groupExpensesId);
 
+	Optional<GroupExpenses> findFirstByGroupExpensesIdAndIsDeletedTrue(Long groupExpesesId);
+
 }
