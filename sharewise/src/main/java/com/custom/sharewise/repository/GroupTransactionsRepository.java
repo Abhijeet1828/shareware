@@ -1,6 +1,7 @@
 package com.custom.sharewise.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -15,7 +16,10 @@ public interface GroupTransactionsRepository extends JpaRepository<GroupTransact
 	Long deleteByGroupExpensesId(Long groupExpensesId);
 
 	List<GroupTransactions> findAllByGroupExpensesIdAndIsDeletedFalse(Long groupExpensesId);
-	
+
 	List<GroupTransactions> findAllByGroupExpensesIdAndIsDeletedTrue(Long groupExpensesId);
+
+	Optional<GroupTransactions> findFirstByGroupTransactionsIdAndTransactionTypeAndIsDeletedFalse(
+			Long groupTransactionsId, String transactionType);
 
 }

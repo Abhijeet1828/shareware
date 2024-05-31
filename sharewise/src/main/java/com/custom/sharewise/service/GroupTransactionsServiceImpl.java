@@ -17,13 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.custom.common.utilities.exception.CommonException;
 import com.custom.common.utilities.exception.UnauthorizedException;
+import com.custom.sharewise.authentication.CustomUserDetails;
 import com.custom.sharewise.constants.Constants;
 import com.custom.sharewise.constants.FailureConstants;
 import com.custom.sharewise.dto.UserGroupDto;
 import com.custom.sharewise.model.GroupTransactions;
 import com.custom.sharewise.repository.GroupTransactionsRepository;
 import com.custom.sharewise.request.AddOrUpdateExpenseRequest;
-import com.custom.sharewise.request.AddTransactionRequest;
+import com.custom.sharewise.request.AddOrUpdateTransactionRequest;
 import com.custom.sharewise.validation.BusinessValidationService;
 
 import lombok.RequiredArgsConstructor;
@@ -74,17 +75,21 @@ public class GroupTransactionsServiceImpl implements GroupTransactionsService {
 	}
 
 	@Override
-	public Object addUserPaymentTransaction(AddTransactionRequest addTransactionRequest) throws CommonException {
+	public Object addUserPaymentTransaction(AddOrUpdateTransactionRequest addTransactionRequest,
+			CustomUserDetails userDetails) throws CommonException {
 		try {
 			Map<String, Object> validations = new HashMap<>();
 			validations.put(Constants.VALIDATION_GROUP_ID, addTransactionRequest.getGroupId());
-			validations.put(Constants.VALIDATION_USER_GROUP, new UserGroupDto(addTransactionRequest.getGroupId(), null,
-					List.of(addTransactionRequest.getPaidBy(), addTransactionRequest.getPaidTo())));
+			validations.put(Constants.VALIDATION_USER_GROUP,
+					new UserGroupDto(addTransactionRequest.getGroupId(), null,
+							List.of(addTransactionRequest.getPaidBy(), addTransactionRequest.getPaidTo(),
+									userDetails.getUserId())));
 
 			businessValidationService.validate(validations);
 
 			modelMapper.getConfiguration().setSkipNullEnabled(true);
-			modelMapper.typeMap(AddTransactionRequest.class, GroupTransactions.class);
+			modelMapper.typeMap(AddOrUpdateTransactionRequest.class, GroupTransactions.class)
+					.addMappings(mapper -> mapper.skip(GroupTransactions::setGroupTransactionsId));
 
 			GroupTransactions groupTransactions = modelMapper.map(addTransactionRequest, GroupTransactions.class);
 			groupTransactions.setTransactionType(Constants.TRANSACTION_TYPE_USER_PAYMENT);
@@ -100,6 +105,43 @@ public class GroupTransactionsServiceImpl implements GroupTransactionsService {
 			else
 				throw new CommonException(FailureConstants.ADD_GROUP_TRANSACTION_ERROR.getFailureCode(),
 						FailureConstants.ADD_GROUP_TRANSACTION_ERROR.getFailureMsg());
+		}
+	}
+
+	@Override
+	public Object updateUserPaymentTransaction(AddOrUpdateTransactionRequest updateTransactionRequest,
+			CustomUserDetails userDetails) throws CommonException {
+		try {
+			Map<String, Object> validations = new HashMap<>();
+			validations.put(Constants.VALIDATION_GROUP_ID, updateTransactionRequest.getGroupId());
+			validations.put(Constants.VALIDATION_USER_GROUP,
+					new UserGroupDto(updateTransactionRequest.getGroupId(), null,
+							List.of(updateTransactionRequest.getPaidBy(), updateTransactionRequest.getPaidTo(),
+									userDetails.getUserId())));
+
+			businessValidationService.validate(validations);
+
+			GroupTransactions groupTransactions = groupTransactionsRepository
+					.findFirstByGroupTransactionsIdAndTransactionTypeAndIsDeletedFalse(
+							updateTransactionRequest.getGroupTransactionsId(), Constants.TRANSACTION_TYPE_USER_PAYMENT)
+					.orElseThrow(() -> new CommonException(FailureConstants.USER_TRANSACTION_NOT_FOUND.getFailureCode(),
+							FailureConstants.USER_TRANSACTION_NOT_FOUND.getFailureMsg()));
+
+			modelMapper.getConfiguration().setSkipNullEnabled(true);
+			modelMapper.typeMap(AddOrUpdateTransactionRequest.class, GroupTransactions.class)
+					.addMappings(mapper -> mapper.skip(GroupTransactions::setGroupTransactionsId));
+
+			modelMapper.map(updateTransactionRequest, groupTransactions);
+			groupTransactions.setModifiedTimestamp(new Date());
+
+			return groupTransactionsRepository.save(groupTransactions);
+		} catch (Exception e) {
+			LOGGER.error("Exception in updateUserPaymentTransaction", e);
+			if (e instanceof CommonException ce)
+				throw ce;
+			else
+				throw new CommonException(FailureConstants.UPDATE_USER_TRANSACTION_ERROR.getFailureCode(),
+						FailureConstants.UPDATE_USER_TRANSACTION_ERROR.getFailureMsg());
 		}
 	}
 
