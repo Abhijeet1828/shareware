@@ -11,7 +11,7 @@ import com.custom.sharewise.model.GroupTransactions;
 @Repository
 public interface GroupTransactionsRepository extends JpaRepository<GroupTransactions, Long> {
 
-	List<GroupTransactions> findAllByGroupId(Long groupId);
+	List<GroupTransactions> findAllByGroupIdAndIsDeletedFalse(Long groupId);
 
 	Long deleteByGroupExpensesId(Long groupExpensesId);
 

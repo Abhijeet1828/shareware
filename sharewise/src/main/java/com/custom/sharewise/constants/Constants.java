@@ -17,7 +17,7 @@ public final class Constants {
 	public static final String GROUP_MEMBER_CONTROLLER = "/group-member";
 	public static final String EXPENSES_CONTROLLER = "/expenses";
 	public static final String TRANSACTIONS_CONTROLLER = "/transactions";
-	public static final String SETTLE_CONTROLLER = "/settle";
+	public static final String PAYMENT_CONTROLLER = "/payment";
 
 	// User Roles
 	public static final String ROLE_ADMIN = "ROLE_ADMIN";
