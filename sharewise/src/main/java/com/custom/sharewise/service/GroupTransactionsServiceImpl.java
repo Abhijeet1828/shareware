@@ -146,6 +146,60 @@ public class GroupTransactionsServiceImpl implements GroupTransactionsService {
 	}
 
 	@Override
+	public Object softDeleteUserPaymentTransaction(Long groupTransactionsId, CustomUserDetails userDetails)
+			throws CommonException {
+		try {
+			GroupTransactions groupTransactions = groupTransactionsRepository
+					.findFirstByGroupTransactionsIdAndTransactionTypeAndIsDeletedFalse(groupTransactionsId,
+							Constants.TRANSACTION_TYPE_USER_PAYMENT)
+					.orElseThrow(() -> new CommonException(FailureConstants.USER_TRANSACTION_NOT_FOUND.getFailureCode(),
+							FailureConstants.USER_TRANSACTION_NOT_FOUND.getFailureMsg()));
+
+			businessValidationService.validate(Map.of(Constants.VALIDATION_USER_GROUP,
+					new UserGroupDto(groupTransactions.getGroupId(), null, List.of(userDetails.getUserId()))));
+
+			groupTransactions.setIsDeleted(true);
+			groupTransactions.setModifiedTimestamp(new Date());
+
+			return groupTransactionsRepository.save(groupTransactions);
+		} catch (Exception e) {
+			LOGGER.error("Exception in softDeleteUserPaymentTransaction", e);
+			if (e instanceof CommonException ce)
+				throw ce;
+			else
+				throw new CommonException(FailureConstants.DELETE_USER_TRANSACTION_ERROR.getFailureCode(),
+						FailureConstants.DELETE_USER_TRANSACTION_ERROR.getFailureMsg());
+		}
+	}
+
+	@Override
+	public Object restoreUserPaymentTransaction(Long groupTransactionsId, CustomUserDetails userDetails)
+			throws CommonException {
+		try {
+			GroupTransactions groupTransactions = groupTransactionsRepository
+					.findFirstByGroupTransactionsIdAndTransactionTypeAndIsDeletedTrue(groupTransactionsId,
+							Constants.TRANSACTION_TYPE_USER_PAYMENT)
+					.orElseThrow(() -> new CommonException(FailureConstants.USER_TRANSACTION_NOT_FOUND.getFailureCode(),
+							FailureConstants.USER_TRANSACTION_NOT_FOUND.getFailureMsg()));
+
+			businessValidationService.validate(Map.of(Constants.VALIDATION_USER_GROUP,
+					new UserGroupDto(groupTransactions.getGroupId(), null, List.of(userDetails.getUserId()))));
+
+			groupTransactions.setIsDeleted(false);
+			groupTransactions.setModifiedTimestamp(new Date());
+
+			return groupTransactionsRepository.save(groupTransactions);
+		} catch (Exception e) {
+			LOGGER.error("Exception in restoreUserPaymentTransaction", e);
+			if (e instanceof CommonException ce)
+				throw ce;
+			else
+				throw new CommonException(FailureConstants.RESTORE_USER_TRANSACTION_ERROR.getFailureCode(),
+						FailureConstants.RESTORE_USER_TRANSACTION_ERROR.getFailureMsg());
+		}
+	}
+
+	@Override
 	public void removeGroupTransactions(Long groupExpensesId) throws CommonException {
 		try {
 			Long deletedRecords = groupTransactionsRepository.deleteByGroupExpensesId(groupExpensesId);

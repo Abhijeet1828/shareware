@@ -15,6 +15,12 @@ public interface GroupTransactionsService {
 	Object updateUserPaymentTransaction(AddOrUpdateTransactionRequest updateTransactionRequest,
 			CustomUserDetails userDetails) throws CommonException;
 
+	Object softDeleteUserPaymentTransaction(Long groupTransactionsId, CustomUserDetails userDetails)
+			throws CommonException;
+
+	Object restoreUserPaymentTransaction(Long groupTransactionsId, CustomUserDetails userDetails)
+			throws CommonException;
+
 	void removeGroupTransactions(Long groupExpensesId) throws CommonException;
 
 	void softDeleteGroupTransactions(Long groupExpensesId) throws CommonException;

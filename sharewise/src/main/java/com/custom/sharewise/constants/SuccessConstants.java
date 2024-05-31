@@ -23,7 +23,9 @@ public enum SuccessConstants {
 	UPDATE_GROUP_EXPENSE(2011, "Group expense updated successfully"),
 	DELETE_GROUP_EXPENSE(2012, "Group expense deleted successfully"),
 	RESTORE_GROUP_EXPENSE(2013, "Group expense restored successfully"),
-	UPDATE_USER_TRANSACTION(2014, "User transaction updated successfully");
+	UPDATE_USER_TRANSACTION(2014, "User transaction updated successfully"),
+	DELETE_USER_TRANSACTION(2015, "User transaction deleted successfully"),
+	RESTORE_USER_TRANSACTION(2016, "User transaction restored successfully");
 
 	private final int successCode;
 	private final String successMsg;

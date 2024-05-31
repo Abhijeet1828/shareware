@@ -35,7 +35,9 @@ public enum FailureConstants {
 	RESTORE_GROUP_TRANSACTION_ERROR(-2021, "Error while restoring group transactions"),
 	RESTORE_GROUP_EXPENSE_ERROR(-2022, "Error while restoring group expense"),
 	USER_TRANSACTION_NOT_FOUND(-2023, "User transaction not found"),
-	UPDATE_USER_TRANSACTION_ERROR(-2024, "Error while updating user transaction");
+	UPDATE_USER_TRANSACTION_ERROR(-2024, "Error while updating user transaction"),
+	DELETE_USER_TRANSACTION_ERROR(-2025, "Error while deleting user transaction"),
+	RESTORE_USER_TRANSACTION_ERROR(-2026, "Error while restoring user transaction");
 
 	private final int failureCode;
 	private final String failureMsg;
