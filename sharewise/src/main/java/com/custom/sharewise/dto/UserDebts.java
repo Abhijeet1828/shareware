@@ -1,4 +1,4 @@
-package com.custom.sharewise.response;
+package com.custom.sharewise.dto;
 
 import java.math.BigDecimal;
 

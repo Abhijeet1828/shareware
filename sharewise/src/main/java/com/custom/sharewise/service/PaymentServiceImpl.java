@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.compare.ComparableUtils;
@@ -23,11 +26,13 @@ import com.custom.sharewise.constants.FailureConstants;
 import com.custom.sharewise.dto.Pair;
 import com.custom.sharewise.dto.PairMaxComparator;
 import com.custom.sharewise.dto.PairMinComparator;
+import com.custom.sharewise.dto.UserDebts;
+import com.custom.sharewise.dto.UserDto;
 import com.custom.sharewise.dto.UserGroupDto;
+import com.custom.sharewise.dto.UserPayment;
 import com.custom.sharewise.model.GroupTransactions;
 import com.custom.sharewise.repository.GroupTransactionsRepository;
 import com.custom.sharewise.response.PaymentSummaryResponse;
-import com.custom.sharewise.response.UserDebts;
 import com.custom.sharewise.validation.BusinessValidationService;
 
 import lombok.RequiredArgsConstructor;
@@ -42,6 +47,7 @@ public class PaymentServiceImpl implements PaymentService {
 
 	private final GroupTransactionsRepository groupTransactionsRepository;
 	private final BusinessValidationService businessValidationService;
+	private final UserService userService;
 
 	@Override
 	public Object simplifyPayments(Long groupId, CustomUserDetails userDetails) throws CommonException {
@@ -58,7 +64,7 @@ public class PaymentServiceImpl implements PaymentService {
 
 			List<UserDebts> userDebtList = simplifyDebts(groupTransactionsList);
 
-			return PaymentSummaryResponse.builder().paymentSummary(userDebtList).isSimplified(true).build();
+			return createUserPaymentSummaryResponse(userDebtList);
 		} catch (Exception e) {
 			LOGGER.error("Exception in settleSimplify", e);
 			if (e instanceof CommonException ce)
@@ -67,6 +73,21 @@ public class PaymentServiceImpl implements PaymentService {
 				throw new CommonException(FailureConstants.SIMPLIFY_PAYMENTS_ERROR.getFailureCode(),
 						FailureConstants.SIMPLIFY_PAYMENTS_ERROR.getFailureMsg());
 		}
+	}
+
+	private PaymentSummaryResponse createUserPaymentSummaryResponse(List<UserDebts> userDebtList) {
+		Set<Long> userIds = userDebtList.stream().flatMap(debt -> Stream.of(debt.owedTo(), debt.owedBy()))
+				.collect(Collectors.toSet());
+		Map<Long, UserDto> userMap = userService.findUsersById(userIds);
+
+		List<UserPayment> userPaymentsSummary = new ArrayList<>();
+		for (UserDebts debt : userDebtList) {
+			UserPayment userPayment = new UserPayment(userMap.get(debt.owedBy()), userMap.get(debt.owedTo()),
+					debt.amount());
+
+			userPaymentsSummary.add(userPayment);
+		}
+		return PaymentSummaryResponse.builder().paymentSummary(userPaymentsSummary).isSimplified(true).build();
 	}
 
 	private List<UserDebts> simplifyDebts(List<GroupTransactions> groupTransactionsList) {
@@ -98,8 +119,6 @@ public class PaymentServiceImpl implements PaymentService {
 	}
 
 	private List<UserDebts> minimumTransactions(PriorityQueue<Pair> receivers, PriorityQueue<Pair> givers) {
-		// int numOfTransactions = 0;
-		// StringBuilder stringBuilder = new StringBuilder();
 		List<UserDebts> userDebtList = new ArrayList<>();
 
 		while (!receivers.isEmpty()) {
@@ -108,29 +127,17 @@ public class PaymentServiceImpl implements PaymentService {
 
 			if (maxPair.netAmount().add(minPair.netAmount()).compareTo(BigDecimal.ZERO) < 0) {
 				userDebtList.add(new UserDebts(minPair.userId(), maxPair.userId(), maxPair.netAmount()));
-				// stringBuilder.append(minPair.userId() + "->" + maxPair.userId() + ":" +
-				// maxPair.netAmount() + "\n");
 				Pair pair = new Pair(minPair.userId(), maxPair.netAmount().add(minPair.netAmount()));
 				givers.add(pair);
 			} else if (maxPair.netAmount().add(minPair.netAmount()).compareTo(BigDecimal.ZERO) > 0) {
 				userDebtList.add(new UserDebts(minPair.userId(), maxPair.userId(), minPair.netAmount().abs()));
-				// stringBuilder.append(minPair.userId() + "->" + maxPair.userId() + ":" +
-				// minPair.netAmount().abs() + "\n");
 				Pair pair = new Pair(maxPair.userId(), maxPair.netAmount().add(minPair.netAmount()));
 				receivers.add(pair);
 			} else {
 				userDebtList.add(new UserDebts(minPair.userId(), maxPair.userId(), maxPair.netAmount()));
-				// stringBuilder.append(minPair.userId() + "->" + maxPair.userId() + ":" +
-				// maxPair.netAmount() + "\n");
 			}
-			// numOfTransactions++;
 		}
 		return userDebtList;
-
-		/*
-		 * LOGGER.info(stringBuilder.toString()); LOGGER.info("Num of transactions {}",
-		 * numOfTransactions);
-		 */
 	}
 
 }

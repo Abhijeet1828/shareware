@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@Table
-@Entity(name = "user_group_mapping")
+@Table(name = "user_group_mapping")
+@Entity
 @Getter
 @Setter
 @ToString

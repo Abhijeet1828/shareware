@@ -1,6 +1,8 @@
 package com.custom.sharewise.service;
 
 import java.util.Date;
+import java.util.Map;
+import java.util.Set;
 
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -15,6 +17,7 @@ import com.custom.common.utilities.exception.CommonException;
 import com.custom.common.utilities.exception.UnauthorizedException;
 import com.custom.sharewise.authentication.CustomUserDetails;
 import com.custom.sharewise.constants.FailureConstants;
+import com.custom.sharewise.dto.UserDto;
 import com.custom.sharewise.model.User;
 import com.custom.sharewise.repository.UserRepository;
 import com.custom.sharewise.request.UpdatePasswordRequest;
@@ -84,6 +87,11 @@ public class UserServiceImpl implements UserService {
 					FailureConstants.INTERNAL_SERVER_ERROR.getFailureMsg());
 			}
 		}
+	}
+
+	@Override
+	public Map<Long, UserDto> findUsersById(Set<Long> userIds) {
+		return userRepository.findUsersByIdListAsMap(userIds);
 	}
 
 }
