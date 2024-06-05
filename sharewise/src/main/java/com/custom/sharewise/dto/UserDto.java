@@ -1,5 +1,7 @@
 package com.custom.sharewise.dto;
 
-public record UserDto(Long userId, String name) {
+import java.io.Serializable;
+
+public record UserDto(Long userId, String name) implements Serializable {
 
 }

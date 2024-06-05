@@ -1,5 +1,6 @@
 package com.custom.sharewise.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,5 +14,7 @@ public interface GroupExpensesRepository extends JpaRepository<GroupExpenses, Lo
 	Optional<GroupExpenses> findFirstByGroupExpensesIdAndIsDeletedFalse(Long groupExpensesId);
 
 	Optional<GroupExpenses> findFirstByGroupExpensesIdAndIsDeletedTrue(Long groupExpesesId);
+	
+	List<GroupExpenses> findByGroupIdAndIsDeletedFalse(Long groupId);
 
 }

@@ -29,7 +29,8 @@ public enum SuccessConstants {
 	NO_DEBTS_TO_SIMPLIFY(2017, "No debts to simplify in the group"),
 	SIMPLIFY_PAYMENTS(2018, "Payments simplified successfully"),
 	FETCH_GROUP_MEMBERS(2019, "Group members fetched successfully"),
-	FETCH_PAYMENT_SUMMARY(2020, "Group payment summary fetched successfully");
+	FETCH_PAYMENT_SUMMARY(2020, "Group payment summary fetched successfully"),
+	FETCH_GROUP_EXPENSE_SUMMARY(2021, "Group expense summary fetched successfully");
 
 	private final int successCode;
 	private final String successMsg;

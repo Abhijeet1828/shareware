@@ -24,5 +24,7 @@ public interface GroupTransactionsRepository extends JpaRepository<GroupTransact
 
 	Optional<GroupTransactions> findFirstByGroupTransactionsIdAndTransactionTypeAndIsDeletedTrue(
 			Long groupTransactionsId, String transactionType);
+	
+	List<GroupTransactions> findAllByGroupIdAndTransactionTypeAndIsDeletedFalse(Long groupId, String transactionType);
 
 }

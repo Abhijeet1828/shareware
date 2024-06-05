@@ -249,4 +249,17 @@ public class GroupTransactionsServiceImpl implements GroupTransactionsService {
 					FailureConstants.RESTORE_GROUP_TRANSACTION_ERROR.getFailureMsg());
 		}
 	}
+
+	@Override
+	public List<GroupTransactions> fetchAllGroupTransactionsByType(Long groupId, String transactionType)
+			throws CommonException {
+		try {
+			return groupTransactionsRepository.findAllByGroupIdAndTransactionTypeAndIsDeletedFalse(groupId,
+					transactionType);
+		} catch (Exception e) {
+			LOGGER.error("Exception in fetchAllGroupTransactionsByType", e);
+			throw new CommonException(FailureConstants.FETCH_GROUP_TRANSACTIONS_ERROR.getFailureCode(),
+					FailureConstants.FETCH_GROUP_TRANSACTIONS_ERROR.getFailureMsg());
+		}
+	}
 }

@@ -40,7 +40,10 @@ public enum FailureConstants {
 	RESTORE_USER_TRANSACTION_ERROR(-2026, "Error while restoring user transaction"),
 	SIMPLIFY_PAYMENTS_ERROR(-2027, "Error while fetching simplified payments"),
 	FETCH_GROUP_MEMBERS_ERROR(-2028, "Error while fetching group members"),
-	FETCH_PAYMENTS_SUMMARY_ERROR(-2029, "Error while fetching group payment summary");
+	FETCH_PAYMENTS_SUMMARY_ERROR(-2029, "Error while fetching group payment summary"),
+	FETCH_GROUP_EXPENSES_ERROR(-2030, "Error while fetching group expenses"),
+	FETCH_GROUP_TRANSACTIONS_ERROR(-2031, "Error while fetching group transactions"),
+	FETCH_GROUP_EXPENSE_SUMMARY(-2032, "Error while fetching group expense summary");
 
 	private final int failureCode;
 	private final String failureMsg;

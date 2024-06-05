@@ -8,6 +8,7 @@ import com.custom.common.utilities.validators.SafeInput;
 import com.custom.sharewise.validation.OnCreate;
 import com.custom.sharewise.validation.OnUpdate;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -25,6 +26,10 @@ public class AddOrUpdateExpenseRequest implements Serializable {
 	@Positive(groups = { OnCreate.class, OnUpdate.class })
 	@NotNull(groups = { OnCreate.class, OnUpdate.class })
 	private Long groupId;
+	
+	@SafeInput(groups = { OnCreate.class, OnUpdate.class })
+	@NotBlank(groups = { OnCreate.class, OnUpdate.class })
+	private String title;
 
 	@Positive(groups = { OnCreate.class, OnUpdate.class })
 	@NotNull(groups = { OnCreate.class, OnUpdate.class })

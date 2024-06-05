@@ -173,4 +173,15 @@ public class ExpensesServiceImpl implements ExpensesService {
 		}
 	}
 
+	@Override
+	public List<GroupExpenses> fetchAllGroupExpenses(Long groupId) throws CommonException {
+		try {
+			return groupExpensesRepository.findByGroupIdAndIsDeletedFalse(groupId);
+		} catch (Exception e) {
+			LOGGER.error("Exception in fetchAllGroupExpenses", e);
+			throw new CommonException(FailureConstants.FETCH_GROUP_EXPENSES_ERROR.getFailureCode(),
+					FailureConstants.FETCH_GROUP_EXPENSES_ERROR.getFailureMsg());
+		}
+	}
+
 }

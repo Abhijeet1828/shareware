@@ -18,6 +18,7 @@ public final class Constants {
 	public static final String EXPENSES_CONTROLLER = "/expenses";
 	public static final String TRANSACTIONS_CONTROLLER = "/transactions";
 	public static final String PAYMENT_CONTROLLER = "/payment";
+	public static final String SUMMARY_CONTROLLER = "/summary";
 
 	// User Roles
 	public static final String ROLE_ADMIN = "ROLE_ADMIN";
