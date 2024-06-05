@@ -9,7 +9,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class PaymentSummaryResponse {
+public class SimplifiedDebtResponse {
 
 	private List<UserPayment> paymentSummary;
 

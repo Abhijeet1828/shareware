@@ -35,6 +35,9 @@ public class GroupExpenses extends BaseModel implements Serializable {
 
 	@Column(name = "group_id")
 	private Long groupId;
+	
+	@Column(name = "title")
+	private String title;
 
 	@Column(name = "paid_by")
 	private Long paidBy;

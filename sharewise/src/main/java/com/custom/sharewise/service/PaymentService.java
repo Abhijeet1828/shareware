@@ -7,4 +7,6 @@ public interface PaymentService {
 
 	Object simplifyPayments(Long groupId, CustomUserDetails userDetails) throws CommonException;
 
+	Object paymentSummary(Long groupId, CustomUserDetails userDetails) throws CommonException;
+
 }

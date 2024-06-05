@@ -38,4 +38,13 @@ public class PaymentController {
 			return ResponseHelper.generateResponse(SuccessConstants.SIMPLIFY_PAYMENTS.getSuccessCode(),
 					SuccessConstants.SIMPLIFY_PAYMENTS.getSuccessMsg(), response);
 	}
+
+	@GetMapping(value = "/summary/{groupId}")
+	public ResponseEntity<Object> summaryPayments(@NotNull @Positive @PathVariable(value = "groupId") Long groupId,
+			@AuthenticationPrincipal CustomUserDetails userDetails) throws CommonException {
+		Object response = paymentService.paymentSummary(groupId, userDetails);
+
+		return ResponseHelper.generateResponse(SuccessConstants.FETCH_PAYMENT_SUMMARY.getSuccessCode(),
+				SuccessConstants.FETCH_PAYMENT_SUMMARY.getSuccessMsg(), response);
+	}
 }

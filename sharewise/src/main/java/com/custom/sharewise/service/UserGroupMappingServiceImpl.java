@@ -2,8 +2,10 @@ package com.custom.sharewise.service;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +18,11 @@ import com.custom.common.utilities.exception.UnauthorizedException;
 import com.custom.sharewise.authentication.CustomUserDetails;
 import com.custom.sharewise.constants.Constants;
 import com.custom.sharewise.constants.FailureConstants;
+import com.custom.sharewise.dto.UserDto;
 import com.custom.sharewise.dto.UserGroupDto;
 import com.custom.sharewise.model.UserGroupMapping;
 import com.custom.sharewise.repository.UserGroupMappingRepository;
+import com.custom.sharewise.response.GroupMembersResponse;
 import com.custom.sharewise.validation.BusinessValidationService;
 
 import lombok.RequiredArgsConstructor;
@@ -33,6 +37,7 @@ public class UserGroupMappingServiceImpl implements UserGroupMappingService {
 
 	private final UserGroupMappingRepository userGroupMappingRepository;
 	private final BusinessValidationService businessValidationService;
+	private final UserService userService;
 
 	@Override
 	public void addUserToGroup(Long groupId, Long userId) throws CommonException {
@@ -106,6 +111,40 @@ public class UserGroupMappingServiceImpl implements UserGroupMappingService {
 			default -> throw new CommonException(FailureConstants.REMOVE_USER_FROM_GROUP_ERROR.getFailureCode(),
 					FailureConstants.REMOVE_USER_FROM_GROUP_ERROR.getFailureMsg());
 			}
+		}
+	}
+
+	@Override
+	public Object fetchGroupMembers(Long groupId, CustomUserDetails userDetails) throws CommonException {
+		try {
+			businessValidationService.validate(Map.of(Constants.VALIDATION_USER_GROUP,
+					new UserGroupDto(groupId, null, List.of(userDetails.getUserId()))));
+
+			List<UserGroupMapping> groupMembers = userGroupMappingRepository.findByGroupIdAndIsRemovedFalse(groupId);
+
+			Map<Long, UserDto> userMap = userService
+					.findUsersById(groupMembers.stream().map(UserGroupMapping::getUserId).collect(Collectors.toSet()));
+			return new GroupMembersResponse(groupId, userMap.values().stream().toList());
+		} catch (Exception e) {
+			LOGGER.error("Exception in getMembersOfGroup", e);
+			if (e instanceof CommonException ce)
+				throw ce;
+			else
+				throw new CommonException(FailureConstants.FETCH_GROUP_MEMBERS_ERROR.getFailureCode(),
+						FailureConstants.FETCH_GROUP_MEMBERS_ERROR.getFailureMsg());
+		}
+	}
+
+	@Override
+	public Map<Long, UserDto> fetchGroupMembers(Long groupId) throws CommonException {
+		try {
+			List<UserGroupMapping> groupMembers = userGroupMappingRepository.findByGroupIdAndIsRemovedFalse(groupId);
+
+			return userService
+					.findUsersById(groupMembers.stream().map(UserGroupMapping::getUserId).collect(Collectors.toSet()));
+		} catch (Exception e) {
+			throw new CommonException(FailureConstants.FETCH_GROUP_MEMBERS_ERROR.getFailureCode(),
+					FailureConstants.FETCH_GROUP_MEMBERS_ERROR.getFailureMsg());
 		}
 	}
 

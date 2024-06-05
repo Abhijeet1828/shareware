@@ -38,7 +38,9 @@ public enum FailureConstants {
 	UPDATE_USER_TRANSACTION_ERROR(-2024, "Error while updating user transaction"),
 	DELETE_USER_TRANSACTION_ERROR(-2025, "Error while deleting user transaction"),
 	RESTORE_USER_TRANSACTION_ERROR(-2026, "Error while restoring user transaction"),
-	SIMPLIFY_PAYMENTS_ERROR(-2027, "Error while fetching simplified payments");
+	SIMPLIFY_PAYMENTS_ERROR(-2027, "Error while fetching simplified payments"),
+	FETCH_GROUP_MEMBERS_ERROR(-2028, "Error while fetching group members"),
+	FETCH_PAYMENTS_SUMMARY_ERROR(-2029, "Error while fetching group payment summary");
 
 	private final int failureCode;
 	private final String failureMsg;

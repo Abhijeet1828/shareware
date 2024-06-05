@@ -1,8 +1,11 @@
 package com.custom.sharewise.service;
 
+import java.util.Map;
+
 import com.custom.common.utilities.exception.CommonException;
 import com.custom.common.utilities.exception.UnauthorizedException;
 import com.custom.sharewise.authentication.CustomUserDetails;
+import com.custom.sharewise.dto.UserDto;
 
 public interface UserGroupMappingService {
 
@@ -13,5 +16,9 @@ public interface UserGroupMappingService {
 
 	void removeUserFromGroup(Long groupId, Long userId, CustomUserDetails userDetails)
 			throws CommonException, UnauthorizedException;
+
+	Object fetchGroupMembers(Long groupId, CustomUserDetails userDetails) throws CommonException;
+
+	Map<Long, UserDto> fetchGroupMembers(Long groupId) throws CommonException;
 
 }

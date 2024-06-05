@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.compare.ComparableUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,9 +31,11 @@ import com.custom.sharewise.dto.UserDebts;
 import com.custom.sharewise.dto.UserDto;
 import com.custom.sharewise.dto.UserGroupDto;
 import com.custom.sharewise.dto.UserPayment;
+import com.custom.sharewise.dto.UserPaymentSummary;
 import com.custom.sharewise.model.GroupTransactions;
 import com.custom.sharewise.repository.GroupTransactionsRepository;
-import com.custom.sharewise.response.PaymentSummaryResponse;
+import com.custom.sharewise.response.GroupPaymentSummaryResponse;
+import com.custom.sharewise.response.SimplifiedDebtResponse;
 import com.custom.sharewise.validation.BusinessValidationService;
 
 import lombok.RequiredArgsConstructor;
@@ -48,6 +51,7 @@ public class PaymentServiceImpl implements PaymentService {
 	private final GroupTransactionsRepository groupTransactionsRepository;
 	private final BusinessValidationService businessValidationService;
 	private final UserService userService;
+	private final UserGroupMappingService userGroupMappingService;
 
 	@Override
 	public Object simplifyPayments(Long groupId, CustomUserDetails userDetails) throws CommonException {
@@ -64,9 +68,9 @@ public class PaymentServiceImpl implements PaymentService {
 
 			List<UserDebts> userDebtList = simplifyDebts(groupTransactionsList);
 
-			return createUserPaymentSummaryResponse(userDebtList);
+			return createSimplifiedDebtResponse(userDebtList);
 		} catch (Exception e) {
-			LOGGER.error("Exception in settleSimplify", e);
+			LOGGER.error("Exception in simplifyPayments", e);
 			if (e instanceof CommonException ce)
 				throw ce;
 			else
@@ -75,7 +79,39 @@ public class PaymentServiceImpl implements PaymentService {
 		}
 	}
 
-	private PaymentSummaryResponse createUserPaymentSummaryResponse(List<UserDebts> userDebtList) {
+	@Override
+	public Object paymentSummary(Long groupId, CustomUserDetails userDetails) throws CommonException {
+		try {
+			businessValidationService.validate(Map.of(Constants.VALIDATION_USER_GROUP,
+					new UserGroupDto(groupId, null, List.of(userDetails.getUserId()))));
+
+			List<GroupTransactions> groupTransactionsList = groupTransactionsRepository
+					.findAllByGroupIdAndIsDeletedFalse(groupId);
+
+			Map<Long, UserDto> groupMembers = userGroupMappingService.fetchGroupMembers(groupId);
+
+			Map<Long, BigDecimal> userToNetAmount = createUserToNetAmountMap(groupTransactionsList, groupMembers);
+
+			List<UserPaymentSummary> userPaymentList = new ArrayList<>();
+			for (Map.Entry<Long, BigDecimal> item : userToNetAmount.entrySet()) {
+				UserPaymentSummary userPaymentSummary = new UserPaymentSummary(groupMembers.get(item.getKey()),
+						item.getValue());
+
+				userPaymentList.add(userPaymentSummary);
+			}
+
+			return new GroupPaymentSummaryResponse(groupId, userPaymentList);
+		} catch (Exception e) {
+			LOGGER.error("Exception in paymentSummary", e);
+			if (e instanceof CommonException ce)
+				throw ce;
+			else
+				throw new CommonException(FailureConstants.FETCH_PAYMENTS_SUMMARY_ERROR.getFailureCode(),
+						FailureConstants.FETCH_PAYMENTS_SUMMARY_ERROR.getFailureMsg());
+		}
+	}
+
+	private SimplifiedDebtResponse createSimplifiedDebtResponse(List<UserDebts> userDebtList) {
 		Set<Long> userIds = userDebtList.stream().flatMap(debt -> Stream.of(debt.owedTo(), debt.owedBy()))
 				.collect(Collectors.toSet());
 		Map<Long, UserDto> userMap = userService.findUsersById(userIds);
@@ -87,18 +123,11 @@ public class PaymentServiceImpl implements PaymentService {
 
 			userPaymentsSummary.add(userPayment);
 		}
-		return PaymentSummaryResponse.builder().paymentSummary(userPaymentsSummary).isSimplified(true).build();
+		return SimplifiedDebtResponse.builder().paymentSummary(userPaymentsSummary).isSimplified(true).build();
 	}
 
 	private List<UserDebts> simplifyDebts(List<GroupTransactions> groupTransactionsList) {
-		Map<Long, BigDecimal> userToNetAmount = new HashMap<>();
-
-		for (GroupTransactions transaction : groupTransactionsList) {
-			userToNetAmount.put(transaction.getPaidBy(), userToNetAmount
-					.getOrDefault(transaction.getPaidBy(), BigDecimal.ZERO).add(transaction.getAmount()));
-			userToNetAmount.put(transaction.getPaidTo(), userToNetAmount
-					.getOrDefault(transaction.getPaidTo(), BigDecimal.ZERO).subtract(transaction.getAmount()));
-		}
+		Map<Long, BigDecimal> userToNetAmount = createUserToNetAmountMap(groupTransactionsList, null);
 
 		PriorityQueue<Pair> receivers = new PriorityQueue<>(new PairMaxComparator());
 		PriorityQueue<Pair> givers = new PriorityQueue<>(new PairMinComparator());
@@ -138,6 +167,26 @@ public class PaymentServiceImpl implements PaymentService {
 			}
 		}
 		return userDebtList;
+	}
+
+	private Map<Long, BigDecimal> createUserToNetAmountMap(List<GroupTransactions> groupTransactionsList,
+			Map<Long, UserDto> groupMembers) {
+		Map<Long, BigDecimal> userToNetAmount = new HashMap<>();
+
+		if (MapUtils.isNotEmpty(groupMembers)) {
+			for (Long userId : groupMembers.keySet()) {
+				userToNetAmount.put(userId, BigDecimal.ZERO);
+			}
+		}
+
+		for (GroupTransactions transaction : groupTransactionsList) {
+			userToNetAmount.put(transaction.getPaidBy(), userToNetAmount
+					.getOrDefault(transaction.getPaidBy(), BigDecimal.ZERO).add(transaction.getAmount()));
+			userToNetAmount.put(transaction.getPaidTo(), userToNetAmount
+					.getOrDefault(transaction.getPaidTo(), BigDecimal.ZERO).subtract(transaction.getAmount()));
+		}
+
+		return userToNetAmount;
 	}
 
 }

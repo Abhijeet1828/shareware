@@ -1,5 +1,6 @@
 package com.custom.sharewise.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,7 +14,8 @@ public interface UserGroupMappingRepository extends JpaRepository<UserGroupMappi
 	Optional<UserGroupMapping> findFirstByGroupIdAndUserIdAndIsRemovedFalse(Long groupId, Long userId);
 
 	boolean existsByGroupIdAndUserIdAndIsRemovedFalse(Long groupId, Long userId);
-	
+
 	Optional<UserGroupMapping> findFirstByGroupIdAndUserId(Long groupId, Long userId);
 
+	List<UserGroupMapping> findByGroupIdAndIsRemovedFalse(Long groupId);
 }
