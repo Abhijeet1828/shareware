@@ -28,12 +28,22 @@ public class SummaryController {
 	private final SummaryService summaryService;
 
 	@GetMapping(value = "/group-expenses/{groupId}")
-	public ResponseEntity<Object> fetchGroupExpenses(
+	public ResponseEntity<Object> fetchGroupExpenseSummary(
 			@NotNull @Positive @PathVariable(value = "groupId", required = true) Long groupId,
 			@AuthenticationPrincipal CustomUserDetails userDetails) throws CommonException {
 		Object response = summaryService.fetchGroupExpenseSummary(groupId, userDetails);
 
 		return ResponseHelper.generateResponse(SuccessConstants.FETCH_GROUP_EXPENSE_SUMMARY.getSuccessCode(),
 				SuccessConstants.FETCH_GROUP_EXPENSE_SUMMARY.getSuccessMsg(), response);
+	}
+
+	@GetMapping(value = "/total-expense/{groupId}")
+	public ResponseEntity<Object> totalGroupExpense(
+			@NotNull @Positive @PathVariable(value = "groupId", required = true) Long groupId,
+			@AuthenticationPrincipal CustomUserDetails userDetails) throws CommonException {
+		Object response = summaryService.fetchTotalGroupExpense(groupId, userDetails);
+
+		return ResponseHelper.generateResponse(SuccessConstants.FETCH_TOTAL_GROUP_EXPENSE_SUMMARY.getSuccessCode(),
+				SuccessConstants.FETCH_TOTAL_GROUP_EXPENSE_SUMMARY.getSuccessMsg(), response);
 	}
 }

@@ -30,7 +30,8 @@ public enum SuccessConstants {
 	SIMPLIFY_PAYMENTS(2018, "Payments simplified successfully"),
 	FETCH_GROUP_MEMBERS(2019, "Group members fetched successfully"),
 	FETCH_PAYMENT_SUMMARY(2020, "Group payment summary fetched successfully"),
-	FETCH_GROUP_EXPENSE_SUMMARY(2021, "Group expense summary fetched successfully");
+	FETCH_GROUP_EXPENSE_SUMMARY(2021, "Group expense summary fetched successfully"),
+	FETCH_TOTAL_GROUP_EXPENSE_SUMMARY(2022, "Total group expense summary fetched successfully");
 
 	private final int successCode;
 	private final String successMsg;

@@ -7,4 +7,6 @@ public interface SummaryService {
 
 	Object fetchGroupExpenseSummary(Long groupId, CustomUserDetails userDetails) throws CommonException;
 
+	Object fetchTotalGroupExpense(Long groupId, CustomUserDetails userDetails) throws CommonException;
+
 }

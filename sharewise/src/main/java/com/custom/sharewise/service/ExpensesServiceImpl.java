@@ -1,5 +1,6 @@
 package com.custom.sharewise.service;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +19,7 @@ import com.custom.common.utilities.exception.UnauthorizedException;
 import com.custom.sharewise.authentication.CustomUserDetails;
 import com.custom.sharewise.constants.Constants;
 import com.custom.sharewise.constants.FailureConstants;
+import com.custom.sharewise.dto.GroupCategoryExpenseDto;
 import com.custom.sharewise.dto.UserGroupDto;
 import com.custom.sharewise.model.GroupExpenses;
 import com.custom.sharewise.repository.GroupExpensesRepository;
@@ -184,4 +186,25 @@ public class ExpensesServiceImpl implements ExpensesService {
 		}
 	}
 
+	@Override
+	public BigDecimal fetchTotalGroupExpense(Long groupId) throws CommonException {
+		try {
+			return groupExpensesRepository.findTotalGroupExpense(groupId);
+		} catch (Exception e) {
+			LOGGER.error("Exception in fetchTotalGroupExpense");
+			throw new CommonException(FailureConstants.FETCH_GROUP_EXPENSES_ERROR.getFailureCode(),
+					FailureConstants.FETCH_GROUP_EXPENSES_ERROR.getFailureMsg());
+		}
+	}
+
+	@Override
+	public List<GroupCategoryExpenseDto> fetchTotalGroupExpenseByCategories(Long groupId) throws CommonException {
+		try {
+			return groupExpensesRepository.findTotalGroupExpenseByCategory(groupId);
+		} catch (Exception e) {
+			LOGGER.error("Exception in fetchTotalGroupExpenseByCategories", e);
+			throw new CommonException(FailureConstants.FETCH_GROUP_EXPENSES_ERROR.getFailureCode(),
+					FailureConstants.FETCH_GROUP_EXPENSES_ERROR.getFailureMsg());
+		}
+	}
 }

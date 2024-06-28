@@ -43,7 +43,8 @@ public enum FailureConstants {
 	FETCH_PAYMENTS_SUMMARY_ERROR(-2029, "Error while fetching group payment summary"),
 	FETCH_GROUP_EXPENSES_ERROR(-2030, "Error while fetching group expenses"),
 	FETCH_GROUP_TRANSACTIONS_ERROR(-2031, "Error while fetching group transactions"),
-	FETCH_GROUP_EXPENSE_SUMMARY(-2032, "Error while fetching group expense summary");
+	FETCH_GROUP_EXPENSE_SUMMARY(-2032, "Error while fetching group expense summary"),
+	FETCH_TOTAL_GROUP_EXPENSE_SUMMARY(-2033, "Error while fetching total group expense summary");
 
 	private final int failureCode;
 	private final String failureMsg;
