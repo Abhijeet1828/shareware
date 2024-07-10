@@ -42,6 +42,7 @@ public class AddOrUpdateExpenseRequest implements Serializable {
 	@NotNull(groups = { OnCreate.class, OnUpdate.class })
 	private BigDecimal totalAmount;
 
+	@NotEmpty
 	@SafeInput(groups = { OnCreate.class, OnUpdate.class })
 	private String category;
 
