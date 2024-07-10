@@ -1,13 +1,13 @@
 package com.custom.sharewise.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.custom.common.utilities.exception.CommonException;
-import com.custom.common.utilities.response.ResponseHelper;
+import com.custom.common.utilities.response.UnifiedResponse;
 import com.custom.sharewise.constants.Constants;
 import com.custom.sharewise.constants.SuccessConstants;
 import com.custom.sharewise.model.User;
@@ -33,6 +33,7 @@ import lombok.RequiredArgsConstructor;
  * @author Abhijeet
  *
  */
+@Tag(name = "Authentication Controller", description = "APIs for user sign-up and login")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(value = Constants.AUTHENTICATION_CONTROLLER + Constants.API_VERSION_1)
@@ -40,30 +41,25 @@ public class AuthenticationController {
 
 	private final AuthenticationService authenticationService;
 
-	@Tag(name = "post", description = "POST methods of Authentication Controller")
 	@Operation(summary = "User Sign-Up API", description = "The API creates a user with the given details")
-	@ApiResponse(responseCode = "200", description = "User created successfully", content = {
-			@Content(mediaType = "application/json", schema = @Schema(implementation = User.class)) })
+	@ApiResponse(responseCode = "201", description = "User created successfully", useReturnTypeSchema = true)
+	@ApiResponse(responseCode = "409", description = "User with the email already exists", content = {
+			@Content(mediaType = "application/json", schema = @Schema(implementation = UnifiedResponse.class)) })
 	@PostMapping(value = "/sign-up")
-	public ResponseEntity<Object> userSignUp(@RequestBody @Valid SignUpRequest signUpRequest) throws CommonException {
-		Object response = authenticationService.userSignUp(signUpRequest);
+	public ResponseEntity<UnifiedResponse<User>> userSignUp(@RequestBody @Valid SignUpRequest signUpRequest) {
+		User createdUser = authenticationService.userSignUp(signUpRequest);
 
-		return ResponseHelper.generateResponse(SuccessConstants.USER_SIGN_UP.getSuccessCode(),
-				SuccessConstants.USER_SIGN_UP.getSuccessMsg(), response);
-
+		return new ResponseEntity<>(new UnifiedResponse<>(SuccessConstants.USER_SIGN_UP.getSuccessCode(),
+				SuccessConstants.USER_SIGN_UP.getSuccessMsg(), createdUser), HttpStatus.CREATED);
 	}
 
-	@Tag(name = "post", description = "POST methods of Authentication Controller")
 	@Operation(summary = "User Login API", description = "The API logs in a user and provides token for futher interaction")
-	@ApiResponse(responseCode = "200", description = "Logged in successfully", content = {
-			@Content(mediaType = "application/json", schema = @Schema(implementation = LoginResponse.class)) })
+	@ApiResponse(responseCode = "200", description = "Logged in successfully", useReturnTypeSchema = true)
 	@PostMapping(value = "/login")
-	public ResponseEntity<Object> userLogin(@RequestBody @Valid LoginRequest loginRequest) {
-		Object response = authenticationService.userLogin(loginRequest);
+	public ResponseEntity<UnifiedResponse<LoginResponse>> userLogin(@RequestBody @Valid LoginRequest loginRequest) {
+		LoginResponse loginResponse = authenticationService.userLogin(loginRequest);
 
-		return ResponseHelper.generateResponse(SuccessConstants.USER_LOGIN.getSuccessCode(),
-				SuccessConstants.USER_LOGIN.getSuccessMsg(),
-				new LoginResponse(loginRequest.getEmail(), response.toString()));
+		return new ResponseEntity<>(new UnifiedResponse<>(SuccessConstants.USER_LOGIN.getSuccessCode(),
+				SuccessConstants.USER_LOGIN.getSuccessMsg(), loginResponse), HttpStatus.OK);
 	}
-
 }

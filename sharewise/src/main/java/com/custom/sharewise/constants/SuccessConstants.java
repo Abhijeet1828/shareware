@@ -1,8 +1,8 @@
 package com.custom.sharewise.constants;
 
 /**
- * Enum for storing the common success HTTP codes and messages that can be used
- * across Spring Boot projects.
+ * Enum for storing the success HTTP codes and messages that will be used
+ * in this application.
  * 
  * @author Abhijeet
  *

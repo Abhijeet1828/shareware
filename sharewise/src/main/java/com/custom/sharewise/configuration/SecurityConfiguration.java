@@ -26,6 +26,14 @@ import com.custom.sharewise.authentication.UserDetailsServiceImpl;
 import com.custom.sharewise.filter.JwtAuthFilter;
 import com.custom.sharewise.repository.UserRepository;
 
+/**
+ * This class is used to define security configurations of the application such
+ * as JWT Filter, Username-Password Authentications and Role based
+ * authentication.
+ * 
+ * @author Abhijeet
+ *
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
@@ -39,11 +47,27 @@ public class SecurityConfiguration {
 		this.userRepository = userRepository;
 	}
 
+	/**
+	 * This bean is used as a DAO for loading user details with custom
+	 * implementation using {@link UserDetailsServiceImpl}.
+	 * 
+	 * @return {@link UserDetailsService}
+	 */
 	@Bean
 	UserDetailsService userDetailsService() {
 		return new UserDetailsServiceImpl(userRepository);
 	}
 
+	/**
+	 * This method is used to create a bean for {@link SecurityFilterChain} which
+	 * handles security of the application by adding filters and different cors and
+	 * xss protection.
+	 * 
+	 * @param http
+	 * @return
+	 * 
+	 * @throws Exception
+	 */
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf(csrf -> csrf.disable()).cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -61,11 +85,23 @@ public class SecurityConfiguration {
 		return http.build();
 	}
 
+	/**
+	 * Creating a bean for the password encoder used to encrypt passwords and store
+	 * in the database.
+	 * 
+	 * @return
+	 */
 	@Bean
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 
+	/**
+	 * Creates a bean for the Authentication provider using
+	 * {@link UserDetailsServiceImpl} and {@link BCryptPasswordEncoder}.
+	 * 
+	 * @return
+	 */
 	@Bean
 	AuthenticationProvider authenticationProvider() {
 		DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
@@ -74,11 +110,24 @@ public class SecurityConfiguration {
 		return authenticationProvider;
 	}
 
+	/**
+	 * Creates a bean for {@link AuthenticationManager}.
+	 * 
+	 * @param config
+	 * @return
+	 * @throws Exception
+	 */
 	@Bean
 	AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
 		return config.getAuthenticationManager();
 	}
 
+	/**
+	 * Creates a bean for CORS configuration of the application. It is later used in
+	 * {@link SecurityFilterChain}.
+	 * 
+	 * @return
+	 */
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration corsConfiguration = new CorsConfiguration();

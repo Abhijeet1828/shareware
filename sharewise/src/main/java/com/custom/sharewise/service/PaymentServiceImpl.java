@@ -13,17 +13,12 @@ import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.compare.ComparableUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.custom.common.utilities.exception.CommonException;
-import com.custom.common.utilities.exception.UnauthorizedException;
 import com.custom.sharewise.authentication.CustomUserDetails;
 import com.custom.sharewise.constants.Constants;
-import com.custom.sharewise.constants.FailureConstants;
 import com.custom.sharewise.dto.Pair;
 import com.custom.sharewise.dto.PairMaxComparator;
 import com.custom.sharewise.dto.PairMinComparator;
@@ -39,14 +34,13 @@ import com.custom.sharewise.response.SimplifiedDebtResponse;
 import com.custom.sharewise.validation.BusinessValidationService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
-@Transactional(propagation = Propagation.REQUIRED, rollbackFor = { CommonException.class,
-		UnauthorizedException.class }, transactionManager = "transactionManager")
+@Transactional(propagation = Propagation.REQUIRED, transactionManager = "transactionManager")
 public class PaymentServiceImpl implements PaymentService {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(PaymentServiceImpl.class);
 
 	private final GroupTransactionsRepository groupTransactionsRepository;
 	private final BusinessValidationService businessValidationService;
@@ -54,61 +48,43 @@ public class PaymentServiceImpl implements PaymentService {
 	private final UserGroupMappingService userGroupMappingService;
 
 	@Override
-	public Object simplifyPayments(Long groupId, CustomUserDetails userDetails) throws CommonException {
-		try {
-			businessValidationService.validate(Map.of(Constants.VALIDATION_USER_GROUP,
-					new UserGroupDto(groupId, null, List.of(userDetails.getUserId()))));
+	public SimplifiedDebtResponse simplifyPayments(Long groupId, CustomUserDetails userDetails) {
+		businessValidationService.validate(Map.of(Constants.VALIDATION_USER_GROUP,
+				new UserGroupDto(groupId, null, List.of(userDetails.getUserId()))));
 
-			List<GroupTransactions> groupTransactionsList = groupTransactionsRepository
-					.findAllByGroupIdAndIsDeletedFalse(groupId);
-			if (CollectionUtils.isEmpty(groupTransactionsList)) {
-				LOGGER.info("No debts to simplify for the groupId {}", groupId);
-				return 1;
-			}
-
-			List<UserDebts> userDebtList = simplifyDebts(groupTransactionsList);
-
-			return createSimplifiedDebtResponse(userDebtList);
-		} catch (Exception e) {
-			LOGGER.error("Exception in simplifyPayments", e);
-			if (e instanceof CommonException ce)
-				throw ce;
-			else
-				throw new CommonException(FailureConstants.SIMPLIFY_PAYMENTS_ERROR.getFailureCode(),
-						FailureConstants.SIMPLIFY_PAYMENTS_ERROR.getFailureMsg());
+		List<GroupTransactions> groupTransactionsList = groupTransactionsRepository
+				.findAllByGroupIdAndIsDeletedFalse(groupId);
+		if (CollectionUtils.isEmpty(groupTransactionsList)) {
+			log.info("No debts to simplify for the groupId {}", groupId);
+			return null;
 		}
+
+		List<UserDebts> userDebtList = simplifyDebts(groupTransactionsList);
+
+		return createSimplifiedDebtResponse(userDebtList);
 	}
 
 	@Override
-	public Object paymentSummary(Long groupId, CustomUserDetails userDetails) throws CommonException {
-		try {
-			businessValidationService.validate(Map.of(Constants.VALIDATION_USER_GROUP,
-					new UserGroupDto(groupId, null, List.of(userDetails.getUserId()))));
+	public GroupPaymentSummaryResponse paymentSummary(Long groupId, CustomUserDetails userDetails) {
+		businessValidationService.validate(Map.of(Constants.VALIDATION_USER_GROUP,
+				new UserGroupDto(groupId, null, List.of(userDetails.getUserId()))));
 
-			List<GroupTransactions> groupTransactionsList = groupTransactionsRepository
-					.findAllByGroupIdAndIsDeletedFalse(groupId);
+		List<GroupTransactions> groupTransactionsList = groupTransactionsRepository
+				.findAllByGroupIdAndIsDeletedFalse(groupId);
 
-			Map<Long, UserDto> groupMembers = userGroupMappingService.fetchGroupMembers(groupId);
+		Map<Long, UserDto> groupMembers = userGroupMappingService.fetchGroupMembers(groupId);
 
-			Map<Long, BigDecimal> userToNetAmount = createUserToNetAmountMap(groupTransactionsList, groupMembers);
+		Map<Long, BigDecimal> userToNetAmount = createUserToNetAmountMap(groupTransactionsList, groupMembers);
 
-			List<UserPaymentSummary> userPaymentList = new ArrayList<>();
-			for (Map.Entry<Long, BigDecimal> item : userToNetAmount.entrySet()) {
-				UserPaymentSummary userPaymentSummary = new UserPaymentSummary(groupMembers.get(item.getKey()),
-						item.getValue());
+		List<UserPaymentSummary> userPaymentList = new ArrayList<>();
+		for (Map.Entry<Long, BigDecimal> item : userToNetAmount.entrySet()) {
+			UserPaymentSummary userPaymentSummary = new UserPaymentSummary(groupMembers.get(item.getKey()),
+					item.getValue());
 
-				userPaymentList.add(userPaymentSummary);
-			}
-
-			return new GroupPaymentSummaryResponse(groupId, userPaymentList);
-		} catch (Exception e) {
-			LOGGER.error("Exception in paymentSummary", e);
-			if (e instanceof CommonException ce)
-				throw ce;
-			else
-				throw new CommonException(FailureConstants.FETCH_PAYMENTS_SUMMARY_ERROR.getFailureCode(),
-						FailureConstants.FETCH_PAYMENTS_SUMMARY_ERROR.getFailureMsg());
+			userPaymentList.add(userPaymentSummary);
 		}
+
+		return new GroupPaymentSummaryResponse(groupId, userPaymentList);
 	}
 
 	private SimplifiedDebtResponse createSimplifiedDebtResponse(List<UserDebts> userDebtList) {

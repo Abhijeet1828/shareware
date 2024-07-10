@@ -1,5 +1,11 @@
 package com.custom.sharewise.constants;
 
+/**
+ * This class stores the constants used in this application.
+ * 
+ * @author Abhijeet
+ *
+ */
 public final class Constants {
 
 	private Constants() {

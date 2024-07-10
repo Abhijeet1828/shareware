@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.custom.common.utilities.exception.CommonException;
+import com.custom.common.utilities.exception.ResourceAlreadyExistsException;
 import com.custom.sharewise.authentication.CustomUserDetails;
 import com.custom.sharewise.authentication.JwtService;
 import com.custom.sharewise.constants.FailureConstants;
@@ -21,12 +21,13 @@ import com.custom.sharewise.model.User;
 import com.custom.sharewise.repository.UserRepository;
 import com.custom.sharewise.request.LoginRequest;
 import com.custom.sharewise.request.SignUpRequest;
+import com.custom.sharewise.response.LoginResponse;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
-@Transactional(propagation = Propagation.REQUIRED, rollbackFor = CommonException.class, transactionManager = "transactionManager")
+@Transactional(propagation = Propagation.REQUIRED, transactionManager = "transactionManager")
 public class AuthenticationServiceImpl implements AuthenticationService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationServiceImpl.class);
@@ -38,38 +39,32 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	private final JwtService jwtService;
 
 	@Override
-	public Object userSignUp(SignUpRequest signUpRequest) throws CommonException {
-		try {
-			if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-				LOGGER.error("User with emailID - {} already exists", signUpRequest.getEmail());
-				throw new CommonException(FailureConstants.USER_ALREADY_EXISTS.getFailureCode(),
-						FailureConstants.USER_ALREADY_EXISTS.getFailureMsg());
-			}
-
-			modelMapper.typeMap(SignUpRequest.class, User.class).addMappings(mapper -> mapper.skip(User::setPassword));
-
-			User newUser = modelMapper.map(signUpRequest, User.class);
-
-			newUser.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
-			newUser.setCreatedTimestamp(new Date());
-			newUser.setModifiedTimestamp(new Date());
-
-			return userRepository.save(newUser);
-		} catch (Exception e) {
-			LOGGER.error("Exception in userSignUp", e);
-			if (e instanceof CommonException ce)
-				throw ce;
-			else
-				throw new CommonException(FailureConstants.SIGN_UP_ERROR.getFailureCode(),
-						FailureConstants.SIGN_UP_ERROR.getFailureMsg());
+	public User userSignUp(SignUpRequest signUpRequest) {
+		if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+			LOGGER.error("User with emailID - {} already exists", signUpRequest.getEmail());
+			throw new ResourceAlreadyExistsException(FailureConstants.USER_ALREADY_EXISTS.getFailureCode(),
+					FailureConstants.USER_ALREADY_EXISTS.getFailureMsg());
 		}
+
+		modelMapper.typeMap(SignUpRequest.class, User.class).addMappings(mapper -> mapper.skip(User::setPassword));
+
+		User newUser = modelMapper.map(signUpRequest, User.class);
+
+		newUser.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
+		newUser.setCreatedTimestamp(new Date());
+		newUser.setModifiedTimestamp(new Date());
+
+		return userRepository.save(newUser);
 	}
 
 	@Override
-	public Object userLogin(LoginRequest loginRequest) {
+	public LoginResponse userLogin(LoginRequest loginRequest) {
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
-		return jwtService.generateToken((CustomUserDetails) authentication.getPrincipal());
+
+		String token = jwtService.generateToken((CustomUserDetails) authentication.getPrincipal());
+
+		return new LoginResponse(loginRequest.getEmail(), token);
 	}
 
 }

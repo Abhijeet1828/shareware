@@ -1,12 +1,13 @@
 package com.custom.sharewise.service;
 
-import com.custom.common.utilities.exception.CommonException;
 import com.custom.sharewise.authentication.CustomUserDetails;
+import com.custom.sharewise.response.GroupExpenseSummaryResponse;
+import com.custom.sharewise.response.TotalGroupExpenseSummaryResponse;
 
 public interface SummaryService {
 
-	Object fetchGroupExpenseSummary(Long groupId, CustomUserDetails userDetails) throws CommonException;
+	GroupExpenseSummaryResponse fetchGroupExpenseSummary(Long groupId, CustomUserDetails userDetails);
 
-	Object fetchTotalGroupExpense(Long groupId, CustomUserDetails userDetails) throws CommonException;
+	TotalGroupExpenseSummaryResponse fetchTotalGroupExpense(Long groupId, CustomUserDetails userDetails);
 
 }

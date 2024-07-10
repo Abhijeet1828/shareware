@@ -1,12 +1,13 @@
 package com.custom.sharewise.service;
 
-import com.custom.common.utilities.exception.CommonException;
 import com.custom.sharewise.authentication.CustomUserDetails;
+import com.custom.sharewise.response.GroupPaymentSummaryResponse;
+import com.custom.sharewise.response.SimplifiedDebtResponse;
 
 public interface PaymentService {
 
-	Object simplifyPayments(Long groupId, CustomUserDetails userDetails) throws CommonException;
+	SimplifiedDebtResponse simplifyPayments(Long groupId, CustomUserDetails userDetails);
 
-	Object paymentSummary(Long groupId, CustomUserDetails userDetails) throws CommonException;
+	GroupPaymentSummaryResponse paymentSummary(Long groupId, CustomUserDetails userDetails);
 
 }

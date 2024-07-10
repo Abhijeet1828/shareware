@@ -1,6 +1,7 @@
 package com.custom.sharewise.filter;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +9,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
@@ -24,6 +26,10 @@ import jakarta.servlet.http.HttpServletResponse;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(JwtAuthFilter.class);
+
+	private static final List<AntPathRequestMatcher> EXCLUDED_URLS = List
+			.of("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-resources").stream()
+			.map(AntPathRequestMatcher::new).toList();
 
 	private final HandlerExceptionResolver handlerExceptionResolver;
 	private final JwtService jwtService;
@@ -69,6 +75,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 			LOGGER.error("Exception in JwtAuthFilter.doFilterInternal {}", e.getMessage());
 			handlerExceptionResolver.resolveException(request, response, null, e);
 		}
+	}
+
+	@Override
+	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+		return EXCLUDED_URLS.stream().anyMatch(matcher -> matcher.matches(request));
 	}
 
 }

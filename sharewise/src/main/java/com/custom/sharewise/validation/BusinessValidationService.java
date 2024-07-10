@@ -5,9 +5,6 @@ import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 
-import com.custom.common.utilities.exception.CommonException;
-import com.custom.common.utilities.exception.UnauthorizedException;
-
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -16,7 +13,7 @@ public class BusinessValidationService {
 
 	private final BusinessValidatorRegistry businessValidatorRegistry;
 
-	public void validate(Map<String, Object> parameters) throws CommonException, UnauthorizedException {
+	public void validate(Map<String, Object> parameters) {
 		for (Map.Entry<String, Object> entry : parameters.entrySet()) {
 			BusinessValidator businessValidator = businessValidatorRegistry.getValidator(entry.getKey());
 			if (Objects.nonNull(businessValidator)) {

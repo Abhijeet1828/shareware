@@ -2,9 +2,12 @@ package com.custom.sharewise.configuration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -54,6 +57,26 @@ public class SwaggerConfiguration {
 				new SecurityScheme().type(Type.HTTP).scheme("bearer").bearerFormat("JWT"));
 
 		return new OpenAPI().info(info).servers(servers).addSecurityItem(securityRequirement).components(components);
+	}
+
+	@Bean
+	OperationCustomizer operationCustomizer() {
+		return (operation, handlerMethod) -> {
+			Optional<PreAuthorize> preAuthorizeAnnotation = Optional
+					.ofNullable(handlerMethod.getMethodAnnotation(PreAuthorize.class));
+			StringBuilder sb = new StringBuilder();
+			sb.append("Roles Required - **");
+			if (preAuthorizeAnnotation.isPresent()) {
+				sb.append((preAuthorizeAnnotation.get()).value().replaceAll("hasRole|\\(|\\)|\\'", ""));
+			} else {
+				sb.append("None");
+			}
+			sb.append("**");
+			sb.append("<br>");
+			sb.append(operation.getDescription());
+			operation.setDescription(sb.toString());
+			return operation;
+		};
 	}
 
 }

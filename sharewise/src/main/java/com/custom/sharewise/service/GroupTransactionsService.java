@@ -2,7 +2,6 @@ package com.custom.sharewise.service;
 
 import java.util.List;
 
-import com.custom.common.utilities.exception.CommonException;
 import com.custom.sharewise.authentication.CustomUserDetails;
 import com.custom.sharewise.model.GroupTransactions;
 import com.custom.sharewise.request.AddOrUpdateExpenseRequest;
@@ -10,27 +9,24 @@ import com.custom.sharewise.request.AddOrUpdateTransactionRequest;
 
 public interface GroupTransactionsService {
 
-	void addGroupTransaction(AddOrUpdateExpenseRequest addExpenseRequest, Long groupExpensesId) throws CommonException;
+	void addGroupTransaction(AddOrUpdateExpenseRequest addExpenseRequest, Long groupExpensesId);
 
-	Object addUserPaymentTransaction(AddOrUpdateTransactionRequest addTransactionRequest, CustomUserDetails userDetails)
-			throws CommonException;
+	GroupTransactions addUserPaymentTransaction(AddOrUpdateTransactionRequest addTransactionRequest,
+			CustomUserDetails userDetails);
 
-	Object updateUserPaymentTransaction(AddOrUpdateTransactionRequest updateTransactionRequest,
-			CustomUserDetails userDetails) throws CommonException;
+	GroupTransactions updateUserPaymentTransaction(AddOrUpdateTransactionRequest updateTransactionRequest,
+			CustomUserDetails userDetails);
 
-	Object softDeleteUserPaymentTransaction(Long groupTransactionsId, CustomUserDetails userDetails)
-			throws CommonException;
+	GroupTransactions softDeleteUserPaymentTransaction(Long groupTransactionsId, CustomUserDetails userDetails);
 
-	Object restoreUserPaymentTransaction(Long groupTransactionsId, CustomUserDetails userDetails)
-			throws CommonException;
+	GroupTransactions restoreUserPaymentTransaction(Long groupTransactionsId, CustomUserDetails userDetails);
 
-	void removeGroupTransactions(Long groupExpensesId) throws CommonException;
+	void removeGroupTransactions(Long groupExpensesId);
 
-	void softDeleteGroupTransactions(Long groupExpensesId) throws CommonException;
+	void softDeleteGroupTransactions(Long groupExpensesId);
 
-	void restoreGroupTransaction(Long groupExpensesId) throws CommonException;
+	void restoreGroupTransaction(Long groupExpensesId);
 
-	List<GroupTransactions> fetchAllGroupTransactionsByType(Long groupId, String transactionType)
-			throws CommonException;
+	List<GroupTransactions> fetchAllGroupTransactionsByType(Long groupId, String transactionType);
 
 }
